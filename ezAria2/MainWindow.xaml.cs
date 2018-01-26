@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Arthas.Controls.Metro;
+using Arthas.Utility.Media;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,11 +20,17 @@ namespace ezAria2
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void SettingButton_Click(object sender, RoutedEventArgs e)
+        {
+            Settings set = new Settings();
+            set.Show();
         }
     }
 }

@@ -1,12 +1,41 @@
-﻿<Window x:Class="ezAria2.MainWindow"
+﻿<Metro:MetroWindow x:Class="ezAria2.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ezAria2"
+        xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="ezAria2" Height="600" Width="800" MinWidth="800" MinHeight="600">
+    <Metro:MetroWindow.Menu>
+        <Metro:MetroTitleMenu>
+            <Metro:MetroTitleMenuItem Header="测试" IsEnabled="False"  />
+            <Metro:MetroTitleMenuItem Header="测试" IsEnabled="False" />
+            <Metro:MetroTitleMenuItem Name="SettingButtom" Header="设置" Click="SettingButton_Click"/>
+            <Metro:MetroTitleMenuItem Header="关于"/>
+        </Metro:MetroTitleMenu>
+    </Metro:MetroWindow.Menu>
+    <Metro:MetroWindow.ContextMenu>
+        <Metro:MetroContextMenu>
+            <Metro:MetroMenuItem x:Name="exit" Header="退出程序" />
+        </Metro:MetroContextMenu>
+    </Metro:MetroWindow.ContextMenu>
     <Grid>
-        
+        <Metro:MetroMenuTabControl IconMode="False" Margin="0" FontSize="18">
+            <Metro:MetroMenuTabItem Icon="Resources/editIcon.png" Header="任务列表" Foreground="Gray" >
+                <Grid Background="#FFE5E5E5">
+                    <Metro:MetroGroupBox Header="正在进行中的任务" Margin="0,10" FontSize="12">
+                        <DataGrid Margin="0,0,0,10"/>
+                    </Metro:MetroGroupBox>
+                </Grid>
+            </Metro:MetroMenuTabItem>
+            <Metro:MetroMenuTabItem Icon="Resources/editIcon.png" Header="下载历史" Foreground="Gray" >
+                <Grid Background="#FFE5E5E5">
+                    <Metro:MetroGroupBox Header="已经完成的下载" Margin="0,10" FontSize="12"/>
+                </Grid>
+            </Metro:MetroMenuTabItem>
+            <Metro:MetroMenuTabItem Header="控件" Icon="Resources/editIcon.png" IconMove="Resources/editIcon.png"/>
+
+        </Metro:MetroMenuTabControl>
     </Grid>
-</Window>
+</Metro:MetroWindow>

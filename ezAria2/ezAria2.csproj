@@ -137,6 +137,14 @@
     <None Include="aria2.about\LICENSE.OpenSSL" />
     <None Include="aria2.about\NEWS" />
     <None Include="aria2.about\README.mingw" />
+    <None Include="Properties\DataSources\App.datasource" />
+    <None Include="Properties\DataSources\ConfigControler.datasource" />
+    <None Include="Properties\DataSources\ConfigFiles.datasource" />
+    <None Include="Properties\DataSources\ezAria2.Properties.Resources.datasource" />
+    <None Include="Properties\DataSources\ezAria2.Properties.Settings.datasource" />
+    <None Include="Properties\DataSources\MainWindow.datasource" />
+    <None Include="Properties\DataSources\Settings.datasource" />
+    <None Include="Properties\DataSources\TaskManager.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -153,6 +161,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="aria2.core\aria2c.exe" />
+    <Resource Include="config.xml">
+      <SubType>Designer</SubType>
+    </Resource>
     <Resource Include="Resources\editIcon.png" />
   </ItemGroup>
   <ItemGroup>

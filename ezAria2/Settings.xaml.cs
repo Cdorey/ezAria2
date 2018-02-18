@@ -17,14 +17,25 @@ using System.Windows.Shapes;
 namespace ezAria2
 {
     /// <summary>
-    /// Window1.xaml 的交互逻辑
+    /// Settings.xaml 的交互逻辑
     /// </summary>
     public partial class Settings : MetroWindow
     {
+        private ConfigControler conf = new ConfigControler();//初始化配置文件控制器对象
+        private bool Str2Bol(String a)//一个安全的办法将conf对象中的字符串内容转换回布尔值
+        {
+            if (a=="true")
+            {
+                return true;
+            }
+            return false;
+        }
+
         public Settings()
         {
            InitializeComponent();
-           ConfigControler conf = new ConfigControler(true);
+            dir.Text = conf.Get("dir");
+            disk_cache.Text = conf.Get("disk_cache");
         }
     }
 }

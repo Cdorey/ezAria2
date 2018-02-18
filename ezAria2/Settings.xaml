@@ -30,15 +30,15 @@
                             </Metro:MetroTextBlock>
                         </Grid>
                         <Grid Margin="130,0,0,0">
-                            <Metro:MetroTextBox Margin="0,0,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,30,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <StackPanel Orientation="Horizontal" Margin="0,60,0,0" Height="24" VerticalAlignment="Top" >
+                            <Metro:MetroTextBox x:Name="dir" Margin="0,0,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
+                            <Metro:MetroTextBox x:Name="disk_cache" Margin="0,30,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
+                            <StackPanel x:Name="file_allocation" Orientation="Horizontal" Margin="0,60,0,0" Height="24" VerticalAlignment="Top" >
                                 <RadioButton Content="None" Margin="5" Foreground="Gray"/>
                                 <RadioButton Content="Falloc" Margin="5" IsChecked="True" Foreground="Gray"/>
                                 <RadioButton Content="Trunc" Margin="5" Foreground="Gray"/>
                                 <RadioButton Content="Prealloc" Margin="5" Foreground="Gray"/>
                             </StackPanel>
-                            <Metro:MetroSwitch Content="开启" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,90,30,0" CornerRadius="2" BorderCornerRadius="3" IsChecked="True"/>
+                            <Metro:MetroSwitch x:Name="_continue" Content="开启" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,90,30,0" CornerRadius="2" BorderCornerRadius="3" IsChecked="True"/>
                         </Grid>
                     </Grid>
                 </Metro:MetroGroupBox>

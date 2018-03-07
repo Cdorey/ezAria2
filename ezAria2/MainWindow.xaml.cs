@@ -1,19 +1,5 @@
 ﻿using Arthas.Controls.Metro;
-using Arthas.Utility.Media;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ezAria2
 {
@@ -31,6 +17,18 @@ namespace ezAria2
         {
             Settings set = new Settings();
             set.Show();
+        }
+
+        private void MetroTitleMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            TaskManager taskManager = new TaskManager();
+            taskManager.Show();
+        }
+
+        private void MetroButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddTask Add = new AddTask();
+            Add.Show();
         }
     }
 }

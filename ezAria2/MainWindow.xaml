@@ -9,7 +9,7 @@
         Title="ezAria2" Height="600" Width="800" MinWidth="800" MinHeight="600">
     <Metro:MetroWindow.Menu>
         <Metro:MetroTitleMenu>
-            <Metro:MetroTitleMenuItem Header="测试" IsEnabled="False"  />
+            <Metro:MetroTitleMenuItem Header="测试" Click="MetroTitleMenuItem_Click"/>
             <Metro:MetroTitleMenuItem Header="测试" IsEnabled="False" />
             <Metro:MetroTitleMenuItem Name="SettingButtom" Header="设置" Click="SettingButton_Click"/>
             <Metro:MetroTitleMenuItem Header="关于"/>
@@ -20,18 +20,91 @@
             <Metro:MetroMenuItem x:Name="exit" Header="退出程序" />
         </Metro:MetroContextMenu>
     </Metro:MetroWindow.ContextMenu>
+    <Window.Resources>
+    </Window.Resources>
     <Grid>
         <Metro:MetroMenuTabControl IconMode="False" Margin="0" FontSize="18">
             <Metro:MetroMenuTabItem Icon="Resources/editIcon.png" Header="任务列表" Foreground="Gray" >
                 <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="60"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
                     <Metro:MetroGroupBox Header="正在进行中的任务" Margin="0,10" FontSize="12">
-                        <DataGrid Margin="0,0,0,10"/>
+                        <ListBox HorizontalContentAlignment="Stretch"  ItemsSource="{Binding Source={StaticResource TaskData},Mode=OneWay}" Margin="0,0,0,10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="40"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="7*"/>
+                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="40"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
+                                        <Metro:MetroProgressBar Value="{Binding Progress,Mode=OneWay}" ProgressBarState="{Binding State}" ProgressBarHeight="25" VerticalAlignment="Center" Grid.Column="1" Grid.ColumnSpan="3" Opacity="0.3" CornerRadius="0"/>
+                                        <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="1"/>
+                                        <Metro:MetroTextBlock Text="{Binding Speed}" FontSize="18" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Right" FontStyle="Italic"/>
+                                        <Metro:MetroSwitch Content="{Binding State}" IsChecked="True" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="4" Grid.ColumnSpan="2"/>
+                                        <Metro:MetroButton MinHeight="30" MinWidth="30" MetroButtonState="Green" Content="▲" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="6" FontSize="20"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </Metro:MetroGroupBox>
+                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,10" HorizontalAlignment="Center">
+                        <Metro:MetroButton MinWidth="70" Margin="20,0" Content="新建任务" MetroButtonState="Green" Click="MetroButton_Click" />
+                        <Metro:MetroButton MinWidth="70" Margin="20,0" Content="全部暂停" MetroButtonState="Green"/>
+                        <Metro:MetroButton MinWidth="70" Margin="20,0" Content="全部开始" MetroButtonState="Green"/>
+                        <Metro:MetroButton MinWidth="70" Margin="20,0" Content="取消全部" MetroButtonState="Red"/>
+                    </StackPanel>
                 </Grid>
             </Metro:MetroMenuTabItem>
             <Metro:MetroMenuTabItem Icon="Resources/editIcon.png" Header="下载历史" Foreground="Gray" >
                 <Grid Background="#FFE5E5E5">
-                    <Metro:MetroGroupBox Header="已经完成的下载" Margin="0,10" FontSize="12"/>
+                    <Metro:MetroGroupBox Header="已经完成的下载" Margin="0,10" FontSize="12">
+                        <ListBox HorizontalContentAlignment="Stretch"  ItemsSource="{Binding Source={StaticResource HistoryData},Mode=OneWay}" Margin="0,0,0,10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="40"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40px"/>
+                                            <ColumnDefinition Width="5*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="40px"/>
+                                            <ColumnDefinition Width="40px"/>
+                                            <ColumnDefinition Width="40px"/>
+                                            <ColumnDefinition Width="40px"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
+                                        <Metro:MetroProgressBar Value="{Binding Progress}" ProgressBarHeight="25" VerticalAlignment="Center" Grid.Column="1" Grid.ColumnSpan="2" Opacity="0.3"/>
+                                        <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="1"/>
+                                        <Metro:MetroTextBlock Text="{Binding Speed}" FontSize="18" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Right" FontStyle="Italic"/>
+                                        <Metro:MetroImage Content="MetroImage" Source="Resources/editIcon.png" ImageHeight="40" ImageWidth="40" Grid.Column="3"/>
+                                        <Metro:MetroImage Content="MetroImage" Source="Resources/editIcon.png" ImageHeight="40" ImageWidth="40" Grid.Column="4"/>
+                                        <Metro:MetroImage Content="MetroImage" Source="Resources/editIcon.png" ImageHeight="40" ImageWidth="40" Grid.Column="5"/>
+                                        <Metro:MetroImage Content="MetroImage" Source="Resources/editIcon.png" ImageHeight="40" ImageWidth="40" Grid.Column="6"/>
+
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Metro:MetroGroupBox>
                 </Grid>
             </Metro:MetroMenuTabItem>
             <Metro:MetroMenuTabItem Header="控件" Icon="Resources/editIcon.png" IconMove="Resources/editIcon.png"/>

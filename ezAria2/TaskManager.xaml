@@ -1,14 +1,13 @@
 ﻿<Metro:MetroWindow
-        xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas" 
-        x:Class="ezAria2.TaskManager"
+        xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ezAria2"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" 
+        x:Class="ezAria2.TaskManager"
         mc:Ignorable="d"
         Title="TaskManager" Height="600" Width="800">
-    <Grid>
-        <ListBox/>
-    </Grid>
+    <Grid/>
 </Metro:MetroWindow>

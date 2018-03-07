@@ -7,132 +7,250 @@
         xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas"
         mc:Ignorable="d"
         Title="设置" Height="600" Width="800" MinWidth="800" MinHeight="600">
+    <Window.Resources>
+        <Style TargetType="Metro:MetroTextBlock">
+            <Setter Property="Margin"  Value="0,10,0,0"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="Metro:MetroTextBox">
+            <Setter Property="Margin"  Value="0,10,0,0"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
     <Grid Background="#FFE5E5E5">
         <Metro:MetroButton Content="取消" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom"/>
         <Metro:MetroButton Content="确定" HorizontalAlignment="Right" Margin="0,0,117,10" VerticalAlignment="Bottom"/>
         <Metro:MetroTextBox Margin="10,0,222,10" TextWrapping="Wrap" Text="" Background="{x:Null}" BorderBrush="{x:Null}" Height="40" VerticalAlignment="Bottom"/>
         <Metro:MetroScrollViewer Margin="0,5,0,50">
-            <Grid>
-                <Metro:MetroGroupBox Header="文件保存相关" Height="160" VerticalAlignment="Top" FontSize="12">
-                    <Grid Margin="0,0,0,0" >
-                        <Grid Margin="0,0,0,0" HorizontalAlignment="Left" Width="130">
-                            <Metro:MetroTextBlock Margin="0,0,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="文件的保存路径" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,30,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="文件缓冲区尺寸" Foreground="Gray"/>
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,60,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="磁盘预分配规则" Foreground="Gray"/>
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,90,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="中断后继续下载" Foreground="Gray"/>
-                            </Metro:MetroTextBlock>
-                        </Grid>
-                        <Grid Margin="130,0,0,0">
-                            <Metro:MetroTextBox x:Name="dir" Margin="0,0,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox x:Name="disk_cache" Margin="0,30,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <StackPanel x:Name="file_allocation" Orientation="Horizontal" Margin="0,60,0,0" Height="24" VerticalAlignment="Top" >
-                                <RadioButton Content="None" Margin="5" Foreground="Gray"/>
-                                <RadioButton Content="Falloc" Margin="5" IsChecked="True" Foreground="Gray"/>
-                                <RadioButton Content="Trunc" Margin="5" Foreground="Gray"/>
-                                <RadioButton Content="Prealloc" Margin="5" Foreground="Gray"/>
-                            </StackPanel>
-                            <Metro:MetroSwitch x:Name="_continue" Content="开启" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,90,30,0" CornerRadius="2" BorderCornerRadius="3" IsChecked="True"/>
-                        </Grid>
+            <StackPanel>
+                <Metro:MetroGroupBox Header="文件策略">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="7*"/>
+                        </Grid.ColumnDefinitions>
+                        <Metro:MetroTextBlock Grid.Row="0">
+                            <Run Text="文件的保存路径" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="1">
+                            <Run Text="文件缓冲区尺寸" Foreground="Gray"/>
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="2">
+                            <Run Text="磁盘预分配规则" Foreground="Gray"/>
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="3">
+                            <Run Text="中断后继续下载" Foreground="Gray"/>
+                        </Metro:MetroTextBlock>
+
+                        <Metro:MetroTextBox x:Name="dir"  Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="disk_cache" Grid.Row="1" Grid.Column="1"/>
+                        <StackPanel x:Name="file_allocation" Orientation="Horizontal" Height="24" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Margin="0,10,0,0" >
+                            <RadioButton x:Name="Disk_None" Content="None" Margin="5" Foreground="Gray"/>
+                            <RadioButton x:Name="Disk_Falloc" Content="Falloc" Margin="5" Foreground="Gray"/>
+                            <RadioButton x:Name="Disk_Trunc" Content="Trunc" Margin="5" Foreground="Gray"/>
+                            <RadioButton x:Name="Disk_Prealloc" Content="Prealloc" Margin="5" Foreground="Gray"/>
+                        </StackPanel>
+                        <Metro:MetroSwitch x:Name="continue" Content="关闭" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                    </Grid>
+                </Metro:MetroGroupBox >
+                <Metro:MetroGroupBox Header="下载选项">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="7*"/>
+                        </Grid.ColumnDefinitions>
+                        <Metro:MetroTextBlock Grid.Row="0">
+                            <Run Text="最大同时下载任务数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="1">
+                            <Run Text="同一服务器连接数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="2">
+                            <Run Text="最小文件分片大小" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="3">
+                            <Run Text="单个任务最大线程数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="4">
+                            <Run Text="整体下载速度限制" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="5">
+                            <Run Text="单个任务下载速度限制" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="6">
+                            <Run Text="整体上传速度限制" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="7">
+                            <Run Text="单个任务上传速度限制" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="8">
+                            <Run Text="IPv6" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="9">
+                            <Run Text="连接超时时间" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="10">
+                            <Run Text="最大重试次数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="11">
+                            <Run Text="设置重试等待的秒数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+
+                        <Metro:MetroTextBox x:Name="max_concurrent_downloads" Width="80" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="max_connection_per_server" Width="80" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="min_split_size" Width="80" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="split" Width="80" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="max_overall_download_limit" Width="80" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="max_download_limit" Width="80" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="max_overall_upload_limit" Width="80" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="max_upload_limit" Width="80" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="disable_ipv6" Width="80" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="timeout" Width="80" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="max_tries" Width="80" HorizontalAlignment="Left" Grid.Row="10" Grid.Column="1"/>
+                        <Metro:MetroTextBox x:Name="retry_wait" Width="80" HorizontalAlignment="Left" Grid.Row="11" Grid.Column="1"/>
                     </Grid>
                 </Metro:MetroGroupBox>
-                <Metro:MetroGroupBox Header="下载连接相关" Height="210" VerticalAlignment="Top" FontSize="12" Margin="0,160,0,0">
-                    <Grid Margin="0,0,0,0" >
-                        <Grid Margin="0,0,0,0" HorizontalAlignment="Left" Width="200">
-                            <Metro:MetroTextBlock Margin="0,0,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="最大同时下载任务数" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,30,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="同一服务器连接数" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,60,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="最小文件分片大小" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,90,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="单个任务最大线程数" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,120,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="整体下载速度限制" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,150,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="单个任务下载速度限制" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                        </Grid>
-                        <Grid Margin="200,0,0,0" HorizontalAlignment="Left" Width="60">
-                            <Metro:MetroTextBox Margin="0,0,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,30,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,60,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,90,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,120,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,150,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                        </Grid>
-                        <Grid Margin="260,0,0,0" HorizontalAlignment="Left" Width="200">
-                            <Metro:MetroTextBlock Margin="0,0,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="整体上传速度限制" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,30,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="单个任务上传速度限制" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,60,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="IPv6" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,90,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="连接超时时间" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,120,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="最大重试次数" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,150,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="设置重试等待的秒数" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                        </Grid>
-                        <Grid Margin="460,0,0,0" HorizontalAlignment="Left" Width="60">
-                            <Metro:MetroTextBox Margin="0,0,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,30,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,60,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,90,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,120,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,150,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                        </Grid>
+                <Metro:MetroGroupBox Header="接口信息">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="7*"/>
+                        </Grid.ColumnDefinitions>
+                        <Metro:MetroTextBlock >
+                            <Run Text="当前的RPC授权令牌" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Column="1">
+                            <Run x:Name="rpc_secret" Text="12345678" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+
                     </Grid>
                 </Metro:MetroGroupBox>
-                <Metro:MetroGroupBox Header="进度保存相关" Height="120" VerticalAlignment="Top" FontSize="12" Margin="0,370,0,0">
-                    <Grid Margin="0,0,0,0" >
-                        <Grid Margin="0,0,0,0" HorizontalAlignment="Left" Width="300">
-                            <Metro:MetroTextBlock Margin="0,0,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="启动时从会话文件中读取下载任务" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,30,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="在Aria2退出时保存未完成任务到会话文件" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,60,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="定时保存会话" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                        </Grid>
-                        <Grid Margin="460,0,0,0" HorizontalAlignment="Left" Width="60">
-                            <Metro:MetroTextBox Margin="0,0,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,30,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                            <Metro:MetroTextBox Margin="0,60,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                        </Grid>
+                <Metro:MetroGroupBox Header="比特设置">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="7*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Metro:MetroTextBlock Grid.Row="0">
+                            <Run Text="最大同时下载任务数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="1">
+                            <Run Text="同一服务器连接数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="2">
+                            <Run Text="最小文件分片大小" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="3">
+                            <Run Text="单个任务最大线程数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="4">
+                            <Run Text="整体下载速度限制" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="5">
+                            <Run Text="单个任务下载速度限制" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="6">
+                            <Run Text="整体上传速度限制" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="7">
+                            <Run Text="单个任务上传速度限制" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="8">
+                            <Run Text="IPv6" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="9">
+                            <Run Text="连接超时时间" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="10">
+                            <Run Text="最大重试次数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="11">
+                            <Run Text="设置重试等待的秒数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="12">
+                            <Run Text="设置重试等待的秒数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="13">
+                            <Run Text="设置重试等待的秒数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="14">
+                            <Run Text="设置重试等待的秒数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+                        <Metro:MetroTextBlock Grid.Row="15">
+                            <Run Text="设置重试等待的秒数" Foreground="Gray" />
+                        </Metro:MetroTextBlock>
+
+                        <Metro:MetroTextBox x:Name="follow_torrent" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="0"/>
+                        <Metro:MetroTextBox x:Name="listen_port" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="1"/>
+                        <Metro:MetroTextBox x:Name="bt_max_peers" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="2"/>
+                        <Metro:MetroTextBox x:Name="enable_dht" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="3"/>
+                        <Metro:MetroTextBox x:Name="enable_dht6" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="4"/>
+                        <Metro:MetroTextBox x:Name="dht_listen_port" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="5"/>
+                        <Metro:MetroTextBox x:Name="bt_enable_lpd" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="6"/>
+                        <Metro:MetroTextBox x:Name="enable_peer_exchange" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="7"/>
+                        <Metro:MetroTextBox x:Name="bt_request_peer_speed_limit" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="8"/>
+                        <Metro:MetroTextBox x:Name="peer_id_prefix" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="9"/>
+                        <Metro:MetroTextBox x:Name="user_agent" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="10"/>
+                        <Metro:MetroTextBox x:Name="seed_ratio" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="11"/>
+                        <Metro:MetroTextBox x:Name="force_save" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="12"/>
+                        <Metro:MetroTextBox x:Name="bt_hash_check_seed" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="13"/>
+                        <Metro:MetroTextBox x:Name="bt_seed_unverified" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="14"/>
+                        <Metro:MetroTextBox x:Name="bt_save_metadata" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="15"/>
+
                     </Grid>
                 </Metro:MetroGroupBox>
-                <Metro:MetroGroupBox Header="远程接口相关" Height="210" VerticalAlignment="Top" FontSize="12" Margin="0,490,0,0">
-                    <Grid Margin="0,0,0,0" >
-                        <Grid Margin="0,0,0,0" HorizontalAlignment="Left" Width="260">
+            </StackPanel>
+            <!--<Grid Margin="0,0,0,0" HorizontalAlignment="Left" Width="260">
                             <Metro:MetroSwitch Content="启用RCP服务" Margin="0,0,15,0" Height="24" VerticalAlignment="Top" FontSize="16" CornerRadius="2" BorderCornerRadius="3" IsChecked="True"/>
                             <Metro:MetroSwitch Content="允许所有来源" Margin="0,30,15,0" Height="24" VerticalAlignment="Top" FontSize="16" CornerRadius="2" BorderCornerRadius="3" IsChecked="True"/>
                             <Metro:MetroSwitch Content="允许非外部访问" Margin="0,60,15,0" Height="24" VerticalAlignment="Top" FontSize="16" CornerRadius="2" BorderCornerRadius="3" IsChecked="True"/>
                             <Metro:MetroTextBlock Margin="0,90,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
                                 <Run Text="RPC监听端口" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBlock Margin="0,120,0,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" FontSize="16">
-                                <Run Text="设置的RPC授权令牌" Foreground="Gray" />
                             </Metro:MetroTextBlock>
                             <Metro:MetroTextBlock  Margin="0,150,0,0" Height="24" VerticalAlignment="Top" FontSize="16">
                                 <Run Text="事件轮询方式" Foreground="Gray"/>
@@ -163,10 +281,7 @@
                         <Grid Margin="460,0,0,0" HorizontalAlignment="Left" Width="60">
                             <Metro:MetroTextBox Margin="0,60,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
                             <Metro:MetroTextBox Margin="0,90,15,0" TextWrapping="Wrap" Height="24" VerticalAlignment="Top" />
-                        </Grid>
-                    </Grid>
-                </Metro:MetroGroupBox>
-            </Grid>
+                        </Grid>-->
         </Metro:MetroScrollViewer>
     </Grid>
 </Metro:MetroWindow>

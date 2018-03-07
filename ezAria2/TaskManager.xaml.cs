@@ -1,7 +1,6 @@
 ﻿using Arthas.Controls.Metro;
 using Arthas.Utility.Media;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +23,11 @@ namespace ezAria2
         public TaskManager()
         {
             InitializeComponent();
+        }
+
+        private void MetroButton_Click(object sender, RoutedEventArgs e)
+        {
+        
         }
     }
 }

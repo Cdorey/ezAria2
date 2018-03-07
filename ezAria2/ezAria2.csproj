@@ -62,11 +62,13 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\..\Downloads\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -85,13 +87,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ConfigFiles.cs" />
+    <Compile Include="AddTask.xaml.cs">
+      <DependentUpon>AddTask.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\ConfigInfo.cs" />
+    <Compile Include="Controllers\Statics.cs" />
+    <Compile Include="NoticeHosts.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NoticeHosts.Designer.cs">
+      <DependentUpon>NoticeHosts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ObjectClass.cs" />
+    <Compile Include="Controllers\Tasks.cs" />
+    <Compile Include="Controllers\ProgressController.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Compile Include="TaskManager.xaml.cs">
       <DependentUpon>TaskManager.xaml</DependentUpon>
     </Compile>
+    <Page Include="AddTask.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -127,6 +146,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="NoticeHosts.resx">
+      <DependentUpon>NoticeHosts.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -137,9 +159,12 @@
     <None Include="aria2.about\LICENSE.OpenSSL" />
     <None Include="aria2.about\NEWS" />
     <None Include="aria2.about\README.mingw" />
+    <None Include="json.conf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
     <None Include="Properties\DataSources\App.datasource" />
     <None Include="Properties\DataSources\ConfigControler.datasource" />
-    <None Include="Properties\DataSources\ConfigFiles.datasource" />
     <None Include="Properties\DataSources\ezAria2.Properties.Resources.datasource" />
     <None Include="Properties\DataSources\ezAria2.Properties.Settings.datasource" />
     <None Include="Properties\DataSources\MainWindow.datasource" />
@@ -154,17 +179,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Arthas-WPFUI\Arthas\Arthas.csproj">
-      <Project>{F5DBBC65-F7D3-4A0D-8A9F-3DAFD3DEB7ED}</Project>
-      <Name>Arthas</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="aria2.core\aria2c.exe" />
+    <Content Include="aria2c.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="config.xml">
       <SubType>Designer</SubType>
     </Resource>
-    <Resource Include="Resources\editIcon.png" />
+    <Resource Include="Resources\editIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
@@ -177,6 +200,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Arthas-WPFUI\Arthas\Arthas.csproj">
+      <Project>{f5dbbc65-f7d3-4a0d-8a9f-3dafd3deb7ed}</Project>
+      <Name>Arthas</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\websocket-sharp\websocket-sharp\websocket-sharp.csproj">
+      <Project>{b357bac7-529e-4d81-a0d2-71041b19c8de}</Project>
+      <Name>websocket-sharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

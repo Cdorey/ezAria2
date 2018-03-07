@@ -98,7 +98,6 @@
     <Compile Include="NoticeHosts.Designer.cs">
       <DependentUpon>NoticeHosts.cs</DependentUpon>
     </Compile>
-    <Compile Include="ObjectClass.cs" />
     <Compile Include="Controllers\Tasks.cs" />
     <Compile Include="Controllers\ProgressController.cs" />
     <Compile Include="Settings.xaml.cs">
@@ -182,6 +181,17 @@
     <Content Include="aria2c.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\bonfire-1849089_640.png" />
+    <Resource Include="Resources\cup-1849083_640.png" />
+    <Resource Include="Resources\stopwatch-1849088_640.png" />
+    <Resource Include="Resources\flag-1095057_640.png" />
+    <Resource Include="Resources\play-1073616_640.png" />
+    <Resource Include="Resources\store-1103556_640.png" />
+    <Resource Include="Resources\edit-1103599_640.png" />
+    <Resource Include="Resources\close-1540630_640.png" />
+    <Resource Include="Resources\cloud-2044797_640.png" />
+    <Resource Include="Resources\cloud-2044820_640.png" />
+    <Resource Include="Resources\cloud-2044822_640.png" />
     <Resource Include="config.xml">
       <SubType>Designer</SubType>
     </Resource>

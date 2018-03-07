@@ -11,6 +11,10 @@ namespace ezAria2
         public MainWindow()
         {
             InitializeComponent();
+            ((TaskList)this.FindResource("TaskData")).Add(new TaskLite { Icon = "Resources/bonfire-1849089_640.png", Progress = 20D, Speed = "300", Gid = "12345678", FileName = "test task" });
+            ((TaskList)this.FindResource("TaskData")).Add(new TaskLite { Icon = "Resources/bonfire-1849089_640.png", Progress = 20D, Speed = "300", Gid = "12345678", FileName = "test task" });
+            ((TaskList)this.FindResource("TaskData")).Add(new TaskLite { Icon = "Resources/bonfire-1849089_640.png", Progress = 20D, Speed = "300", Gid = "12345678", FileName = "test task" });
+            ((TaskList)this.FindResource("TaskData")).Add(new TaskLite { Icon = "Resources/stopwatch-1849088_640.png", State = "wait", Gid = "12345678", FileName = "test task" });
         }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
@@ -25,10 +29,9 @@ namespace ezAria2
             taskManager.Show();
         }
 
-        private void MetroButton_Click(object sender, RoutedEventArgs e)
+        private void MetroBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            AddTask Add = new AddTask();
-            Add.Show();
+            this.Close();
         }
     }
 }

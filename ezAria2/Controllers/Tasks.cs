@@ -12,51 +12,45 @@ namespace ezAria2
     //这里应该有，单个任务的类、任务列表的类、历史列表的类、单个RPC请求的类、单个RPC消息的类、RPC控制器
     public class TaskLite//小型任务对象,用于任务列表
     {
-        public string State//任务的状态
-        {
-            get
-            {
-                switch (Status)
-                {
-                    case "active":
-                        return "none";
-                    case "waiting":
-                        return "wait";
-                    default:
-                        return "error";
-                }
-            }
-        }
+        public string State { get; set; }//任务的状态
         public string Icon { get; set; }//下载文件的图标
         public string Speed { get; set; }//当前速度
-        public double Progress//进度，双精度浮点数
-        {
-            get
-            {
-                if(TotalLength == 0)
-                {
-                    return 0;
-                }
-                else
-                {
-                    double i = CompletedLength / TotalLength;
-                    return i;
-                }
-            }
-        }
+        public double Progress { get; set; } //进度，双精度浮点数
         public string FileName { get; set; }//下载的文件名
 
-        public string Status { get; set; }//从json文件接收的任务状态
         public string Gid { get; set; }//任务的GID
-        public int TotalLength { get; set; }//下载的总长度，单位字节
-        public int CompletedLength { get; set; }//已经完成的下载长度
         public TaskLite(JRCtler.JsonRpcRes e)
         {
-            Status = e.Result.status;
-            TotalLength = e.Result.totalLength;
-            CompletedLength = e.Result.completedLength;
-            Speed = e.Result.downloadSpeed;
+            switch (e.Result.status)
+            {
+                case "active":
+                    State= "none";
+                    Icon = "Resources/bonfire-1849089_640.png";
+                    Speed = e.Result.downloadSpeed;
+                    break;
+                case "waiting":
+                    State= "wait";
+                    Icon = "Resources/stopwatch-1849088_640.png";
+                    break;
+                default:
+                    State= "error";
+                    Icon = "Resources/cup-1849083_640.png";
+                    break;
+            }
+            if (e.Result.totalLength == 0)
+            {
+                Progress= 0;
+            }
+            else
+            {
+                double i = e.Result.completedLength / e.Result.totalLength;
+                Progress= i;
+            }
             Gid = e.Result.gid;
+        }
+
+        public TaskLite()
+        {
         }
     }
     public class TaskList : ObservableCollection<TaskLite>//任务列表

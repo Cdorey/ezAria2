@@ -60,7 +60,7 @@
                         </ListBox>
                     </Metro:MetroGroupBox>
                     <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="5" HorizontalAlignment="Center">
-                        <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50">
+                        <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50" MouseLeftButtonUp="MetroBorder_MouseLeftButtonUp_NewTask">
                             <Metro:MetroImage Source="Resources/play-1073616_640.png"  />
                         </Metro:MetroBorder>
                         <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50">
@@ -111,7 +111,9 @@
                     </Metro:MetroGroupBox>
                 </Grid>
             </Metro:MetroMenuTabItem>
-            <Metro:MetroMenuTabItem Header="控件" Icon="Resources/edit-1103599_640.png" IconMove="Resources/edit-1103599_640.png"/>
+            <Metro:MetroMenuTabItem Header="控件" Icon="Resources/edit-1103599_640.png" IconMove="Resources/edit-1103599_640.png">
+                <Metro:MetroTextBox Name="ForDeveloper" ButtonClick="ForDeveloper_ButtonClick"/>
+            </Metro:MetroMenuTabItem>
 
         </Metro:MetroMenuTabControl>
     </Grid>

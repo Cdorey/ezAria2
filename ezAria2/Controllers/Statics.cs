@@ -48,6 +48,10 @@ namespace ezAria2
             ProCtl = new ProgressController();
 
         }
+        ~Stc()
+        {
+            Aria2Process.Kill();
+        }
     }
 
 }

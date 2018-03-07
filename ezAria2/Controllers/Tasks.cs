@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocketSharp;
@@ -17,36 +18,41 @@ namespace ezAria2
         public string Speed { get; set; }//当前速度
         public double Progress { get; set; } //进度，双精度浮点数
         public string FileName { get; set; }//下载的文件名
-
         public string Gid { get; set; }//任务的GID
+
         public TaskLite(JRCtler.JsonRpcRes e)
         {
-            switch (e.Result.status)
+
+            string Completed = e.Result.completedLength;
+            string Total = e.Result.totalLength;
+            string Status = e.Result.status;
+            switch (Status)
             {
                 case "active":
-                    State= "none";
+                    State = "none";
                     Icon = "Resources/bonfire-1849089_640.png";
                     Speed = e.Result.downloadSpeed;
                     break;
                 case "waiting":
-                    State= "wait";
+                    State = "wait";
                     Icon = "Resources/stopwatch-1849088_640.png";
                     break;
                 default:
-                    State= "error";
+                    State = "error";
                     Icon = "Resources/cup-1849083_640.png";
                     break;
             }
             if (e.Result.totalLength == 0)
             {
-                Progress= 0;
+                Progress = 0;
             }
             else
             {
-                double i = e.Result.completedLength / e.Result.totalLength;
-                Progress= i;
+                double i = long.Parse(Completed)*100 / long.Parse(Total);
+                Progress = i;
             }
             Gid = e.Result.gid;
+            Speed = e.Result.downloadSpeed;
         }
 
         public TaskLite()
@@ -58,8 +64,26 @@ namespace ezAria2
         public TaskList()
         {
         }
+        public async void Refresh()
+        {
+            while (true)
+            {
+                JRCtler.JsonRpcRes x = await Aria2Methords.TellActive();
+                Clear();
+                Thread.Sleep(500);
+                foreach (dynamic s in x.Result)
+                {
+                    JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
+                    {
+                        Result = s
+                    };
+                    Add(new TaskLite(a));
+                }
+            }
+
+        }
     }
-    public class HistoryList:ObservableCollection<Task>
+    public class HistoryList : ObservableCollection<Task>
     {
         public HistoryList()//任务列表的构造函数，实际使用时应当修改
         {
@@ -121,6 +145,12 @@ namespace ezAria2
         private void Send(JsonRpcReq SendMessage)//发消息
         {
             ws.Send(JsonConvert.SerializeObject(SendMessage));
+            //if (!File.Exists(@"log.txt"))
+            //{
+            //    File.CreateText(@"log.txt");
+            //}
+            //string Logs = File.ReadAllText(@"log.txt") +"send:"+ JsonConvert.SerializeObject(SendMessage) + Environment.NewLine;
+            //File.WriteAllText(@"log.txt", Logs);
         }
         private void JsonRpcMessage(string Message)//收消息
         {
@@ -133,14 +163,20 @@ namespace ezAria2
             {
                 RespondList.Add(NewMessage.Id, NewMessage);
             }
+            if (!File.Exists(@"log.txt"))
+            {
+                File.CreateText(@"log.txt");
+            }
+            string Logs = File.ReadAllText(@"log.txt") + "Message:" + Message + Environment.NewLine;
+            File.WriteAllText(@"log.txt", Logs);
         }
 
         //公开方法
         public async Task<JsonRpcRes> JsonRpcAsync(string methord, ArrayList Params)//异步开始一个远程调用
         {
             JsonRpcReq NewTask = new JsonRpcReq(methord, Idlist++, Params);
-            Console.WriteLine(JsonConvert.SerializeObject(NewTask));//这一行应该调用控制器的方法执行NewTask请求
-            await System.Threading.Tasks.Task.Run(() =>
+            Send(NewTask);//这一行应该调用控制器的方法执行NewTask请求
+            await Task.Run(() =>
             {
                 while (!RespondList.ContainsKey(NewTask.Id))
                 {
@@ -154,7 +190,7 @@ namespace ezAria2
         public JRCtler(string Uri)
         {
             ws = new WebSocket(Uri);
-            ws.ConnectAsync();
+            ws.Connect();
             ws.OnOpen += (sender, e) =>
             {
 

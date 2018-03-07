@@ -23,15 +23,15 @@ namespace ezAria2
             }
         }
 
-        private async void MetroButton_Click(object sender, RoutedEventArgs e)
+        private async void MetroButton_Click_Add(object sender, RoutedEventArgs e)
         {
             await Aria2Methords.AddUri(UriBox.Text);
-            this.Close();
+            Close();
         }
 
-        private void MetroButton_Click_1(object sender, RoutedEventArgs e)
+        private void MetroButton_Click_Cancle(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

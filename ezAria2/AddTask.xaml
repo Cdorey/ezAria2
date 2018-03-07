@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="AddTask" Width="600" Height="358" ResizeMode="NoResize" Background="#FFC9C9C9" >
+        Title="AddTask" Width="600" Height="358" ResizeMode="NoResize" Background="#FFC9C9C9" BorderBrush="#FF146099" Icon="Resources/cloud-2044820_640.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="15"/>
@@ -19,8 +19,8 @@
         </Grid.ColumnDefinitions>
         <Metro:MetroTextBox x:Name="UriBox" Text="请输入链接地址" Grid.Column="1" Grid.Row="1" CornerRadius="10" TextWrapping="Wrap" GotFocus="MetroTextBox_GotFocus" />
         <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Metro:MetroButton Content="添加" Height="40" Width="100" Margin="40,0" Click="MetroButton_Click"/>
-            <Metro:MetroButton Content="取消" Height="40" Width="100" Margin="40,0" Click="MetroButton_Click_1"/>
+            <Metro:MetroButton Content="添加" Height="40" Width="100" Margin="40,0" Click="MetroButton_Click_Add" Background="#FF146099"/>
+            <Metro:MetroButton Content="取消" Height="40" Width="100" Margin="40,0" Click="MetroButton_Click_Cancle" Background="#FF146099"/>
         </StackPanel>
     </Grid>
 </Metro:MetroWindow>

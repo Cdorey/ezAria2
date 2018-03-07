@@ -1,5 +1,9 @@
 ﻿using Arthas.Controls.Metro;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
+using System.Xml.Linq;
 
 namespace ezAria2
 {
@@ -11,10 +15,7 @@ namespace ezAria2
         public MainWindow()
         {
             InitializeComponent();
-            ((TaskList)this.FindResource("TaskData")).Add(new TaskLite { Icon = "Resources/bonfire-1849089_640.png", Progress = 20D, Speed = "300", Gid = "12345678", FileName = "test task" });
-            ((TaskList)this.FindResource("TaskData")).Add(new TaskLite { Icon = "Resources/bonfire-1849089_640.png", Progress = 20D, Speed = "300", Gid = "12345678", FileName = "test task" });
-            ((TaskList)this.FindResource("TaskData")).Add(new TaskLite { Icon = "Resources/bonfire-1849089_640.png", Progress = 20D, Speed = "300", Gid = "12345678", FileName = "test task" });
-            ((TaskList)this.FindResource("TaskData")).Add(new TaskLite { Icon = "Resources/stopwatch-1849088_640.png", State = "wait", Gid = "12345678", FileName = "test task" });
+            ((TaskList)this.FindResource("TaskData")).Refresh();
         }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
@@ -32,6 +33,16 @@ namespace ezAria2
         private void MetroBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             this.Close();
+        }
+
+        private void MetroBorder_MouseLeftButtonUp_NewTask(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            AddTask Task = new AddTask();
+            Task.Show();
+        }
+
+        private void ForDeveloper_ButtonClick(object sender, System.EventArgs e)
+        {
         }
     }
 }

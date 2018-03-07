@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocketSharp;
+using ezAria2;
 
 namespace test
 {
@@ -12,126 +13,26 @@ namespace test
     {
         static void Main()
         {
-            string requrl = "ws://127.0.0.1:6800/jsonrpc";
-            WebSocket ws = new WebSocket(requrl);
-            string a2, a3;
-            a2 = "aria2.addUri";
-            a3 = "[\"token:123456\", [\"https://download.microsoft.com/download/A/B/E/ABEE70FE-7DE8-472A-8893-5F69947DE0B1/MediaCreationTool.exe\"]]";
-            ws.ConnectAsync();
-            string send = string.Format("{{\"jsonrpc\" : \"2.0\", \"id\" :123, \"method\" : \"{0}\", \"params\" : {1}}}", a2, a3);
-            ws.OnOpen += (sender, e) =>
+            string Completed = "1312489472";
+            string Total = "8694792192";
+            double Progress;
+            if (Total == "0")
             {
-                Console.WriteLine(send);
-                ws.Send(send);
+                Progress = 0;
+            }
+            else
+            {
+                double i = long.Parse(Completed)*100/long.Parse(Total);
+                Progress = i;
+            }
+            Console.WriteLine(Progress);
+            Console.WriteLine(long.Parse(Completed));
+            Console.WriteLine(long.Parse(Total));
 
-            };
-            ws.OnMessage += (sender, e) =>
-            {
-                Console.WriteLine(e.Data);
-            };
             Console.ReadLine();
         }
     }
 
-    class JRCtler
-    {
-        private class JsonRpcReq//一个请求消息对象
-        {
-            [JsonProperty(PropertyName = "jsonrpc")]
-            public string Version { get { return "2.0"; } }
-            [JsonProperty(PropertyName = "method")]
-            public string Method { get; set; }
-            [JsonProperty(PropertyName = "params")]
-            public ArrayList Params { get; set; }
-            [JsonProperty(PropertyName = "id")]
-            public int Id { get; set; }
-            public JsonRpcReq(string n, int i, ArrayList e)
-            {
-                Method = n;
-                Id = i;
-                Params = e;
-            }
-        }
-        public class JsonRpcRes//一个回复消息对象
-        {
-            [JsonProperty(PropertyName = "jsonrpc")]
-            public string Version { get; set; }
-            [JsonProperty(PropertyName = "method")]
-            public string Method { get; set; }
-            [JsonProperty(PropertyName = "result")]
-            public dynamic Result { get; set; }
-            [JsonProperty(PropertyName = "error")]
-            public ErrorInfo Error { get; set; }
-            [JsonProperty(PropertyName = "id")]
-            public int Id { get; set; }
-            public class ErrorInfo
-            {
-                [JsonProperty(PropertyName = "code")]
-                public string Code { get; set; }
-                [JsonProperty(PropertyName = "message")]
-                public string Message { get; set; }
-                [JsonProperty(PropertyName = "data")]
-                public string Data { get; set; }
-            }
-            public JsonRpcRes()
-            {
-                Id = -1;
-            }
-        }
-        //资源列表
-        private int Idlist = 1;//请求的ID序列号
-        private Dictionary<int, JsonRpcRes> RespondList = new Dictionary<int, JsonRpcRes>();//ID-JsonRpcRes字典
-        private WebSocket ws;//JsonRpc调用所使用的WebSocket链路
-        public Queue<JsonRpcRes> NoticeList = new Queue<JsonRpcRes>();//通知列表
-
-        //私有方法
-        private void Send(JsonRpcReq SendMessage)//发消息
-        {
-            ws.Send(JsonConvert.SerializeObject(SendMessage));
-        }
-        private void JsonRpcMessage(string Message)//收消息
-        {
-            JsonRpcRes NewMessage = JsonConvert.DeserializeObject<JsonRpcRes>(Message);
-            if (NewMessage.Id == -1)
-            {
-                NoticeList.Enqueue(NewMessage);
-            }
-            else
-            {
-                RespondList.Add(NewMessage.Id, NewMessage);
-            }
-        }
-
-        //公开方法
-        public async Task<JsonRpcRes> JsonRpcAsync(string methord, ArrayList Params)//异步开始一个远程调用
-        {
-            JsonRpcReq NewTask = new JsonRpcReq(methord, Idlist++, Params);
-            Console.WriteLine(JsonConvert.SerializeObject(NewTask));//这一行应该调用控制器的方法执行NewTask请求
-            await System.Threading.Tasks.Task.Run(() =>
-            {
-                while (!RespondList.ContainsKey(NewTask.Id))
-                {
-                    Thread.Sleep(500);
-                }
-            });
-            return RespondList[NewTask.Id];
-        }
-
-        //构造函数
-        public JRCtler(string Uri)
-        {
-            ws = new WebSocket(Uri);
-            ws.ConnectAsync();
-            ws.OnOpen += (sender, e) =>
-            {
-
-            };
-            ws.OnMessage += (sender, e) =>
-            {
-                JsonRpcMessage(e.Data);
-            };
-        }
-    }
 
 }
     //class ConfigControler

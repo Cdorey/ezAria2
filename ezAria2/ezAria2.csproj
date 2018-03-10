@@ -92,12 +92,6 @@
     </Compile>
     <Compile Include="Controllers\ConfigInfo.cs" />
     <Compile Include="Controllers\Statics.cs" />
-    <Compile Include="NoticeHosts.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NoticeHosts.Designer.cs">
-      <DependentUpon>NoticeHosts.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controllers\Tasks.cs" />
     <Compile Include="Controllers\ProgressController.cs" />
     <Compile Include="Settings.xaml.cs">
@@ -145,19 +139,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="NoticeHosts.resx">
-      <DependentUpon>NoticeHosts.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="aria2.about\AUTHORS" />
-    <None Include="aria2.about\ChangeLog" />
-    <None Include="aria2.about\COPYING" />
-    <None Include="aria2.about\LICENSE.OpenSSL" />
-    <None Include="aria2.about\NEWS" />
-    <None Include="aria2.about\README.mingw" />
     <None Include="json.conf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

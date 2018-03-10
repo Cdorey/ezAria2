@@ -1,4 +1,5 @@
 ﻿using Arthas.Controls.Metro;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,10 +13,14 @@ namespace ezAria2
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
-            ((TaskList)this.FindResource("TaskData")).Refresh();
+            dispatcherTimer.Tick += new EventHandler(ListRefresh);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 2);
+            dispatcherTimer.Start();
+
         }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
@@ -23,6 +28,12 @@ namespace ezAria2
             Settings set = new Settings();
             set.Show();
         }
+
+        private void ListRefresh(object sender, System.EventArgs e)
+        {
+            ((TaskList)FindResource("TaskData")).Update();
+        }
+
 
         private void MetroTitleMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -41,8 +52,13 @@ namespace ezAria2
             Task.Show();
         }
 
-        private void ForDeveloper_ButtonClick(object sender, System.EventArgs e)
+        private void ForDeveloper_ButtonClick(object sender, EventArgs e)
         {
+        }
+
+        private void MetroWindow_Activated(object sender, EventArgs e)
+        {
+            ((TaskList)this.FindResource("TaskData")).Refresh();
         }
     }
 }

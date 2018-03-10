@@ -20,18 +20,87 @@ namespace ezAria2
         public string FileName { get; set; }//下载的文件名
         public string Gid { get; set; }//任务的GID
 
+        public async void GetFileInfo()
+        {
+            JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
+            string uri = x.Result[0].uris[0].uri;
+            FileName=uri.Substring(uri.LastIndexOf(@"/")+1);
+            //if (x.Result.GetLength(0)!=1)
+            //{
+            //    FileName = FileName + "等";
+            //}
+        }
+        public async Task Refresh()
+        {
+            JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
+            string Completed = e.Result.completedLength;
+            string Total = e.Result.totalLength;
+            string Status = e.Result.status;
+            string SpeedString = e.Result.downloadSpeed;
+            double SpeedLong = double.Parse(SpeedString);
+            if (SpeedLong / 1024 == 0)
+            {
+                Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
+            }
+            else if (SpeedLong / 1048576 == 0)
+            {
+                Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
+            }
+            else
+            {
+                Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
+            }
+            switch (Status)
+            {
+                case "active":
+                    State = "none";
+                    Icon = "Resources/bonfire-1849089_640.png";
+                    break;
+                case "waiting":
+                    State = "wait";
+                    Icon = "Resources/stopwatch-1849088_640.png";
+                    break;
+                default:
+                    State = "error";
+                    Icon = "Resources/cup-1849083_640.png";
+                    break;
+            }
+            if (e.Result.totalLength == 0)
+            {
+                Progress = 0;
+            }
+            else
+            {
+                double i = long.Parse(Completed) * 100 / long.Parse(Total);
+                Progress = i;
+            }
+        }
+
         public TaskLite(JRCtler.JsonRpcRes e)
         {
 
             string Completed = e.Result.completedLength;
             string Total = e.Result.totalLength;
             string Status = e.Result.status;
+            string SpeedString = e.Result.downloadSpeed;
+            double SpeedLong = double.Parse(SpeedString);
+            if (SpeedLong/1024==0)
+            {
+                Speed = Math.Round(SpeedLong,2).ToString() + "B/S";
+            }
+            else if(SpeedLong / 1048576 == 0)
+            {
+                Speed = Math.Round((SpeedLong / 1024),2).ToString() + "KB/S";
+            }
+            else
+            {
+                Speed = Math.Round((SpeedLong / 1048578),2).ToString() + "MB/S";
+            }
             switch (Status)
             {
                 case "active":
                     State = "none";
                     Icon = "Resources/bonfire-1849089_640.png";
-                    Speed = e.Result.downloadSpeed;
                     break;
                 case "waiting":
                     State = "wait";
@@ -52,7 +121,7 @@ namespace ezAria2
                 Progress = i;
             }
             Gid = e.Result.gid;
-            Speed = e.Result.downloadSpeed;
+            GetFileInfo();
         }
 
         public TaskLite()
@@ -66,21 +135,43 @@ namespace ezAria2
         }
         public async void Refresh()
         {
-            while (true)
+            Clear();
+            JRCtler.JsonRpcRes x = await Aria2Methords.TellActive();
+            foreach (dynamic s in x.Result)
             {
-                JRCtler.JsonRpcRes x = await Aria2Methords.TellActive();
-                Clear();
-                Thread.Sleep(500);
-                foreach (dynamic s in x.Result)
+                JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
                 {
-                    JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
-                    {
-                        Result = s
-                    };
-                    Add(new TaskLite(a));
-                }
+                    Result = s
+                };
+                Add(new TaskLite(a));
             }
+            JRCtler.JsonRpcRes y = await Aria2Methords.TellWaiting();
+            foreach (dynamic s in y.Result)
+            {
+                JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
+                {
+                    Result = s
+                };
+                Add(new TaskLite(a));
+            }
+            //JRCtler.JsonRpcRes z = await Aria2Methords.TellStopped();
+            //foreach (dynamic s in z.Result)
+            //{
+            //    JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
+            //    {
+            //        Result = s
+            //    };
+            //    Add(new TaskLite(a));
+            //}
 
+        }
+        public async void Update()
+        {
+            foreach (TaskLite s in this)
+            {
+                await s.Refresh();
+            }
+            OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
         }
     }
     public class HistoryList : ObservableCollection<Task>
@@ -289,6 +380,43 @@ namespace ezAria2
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellActive", Params);
             return Result;
         }
+        public static async Task<JRCtler.JsonRpcRes> TellWaiting()
+        {
+            string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
+            ArrayList Params = new ArrayList
+            {
+                "token:" + Stc.GloConf.rpc_secret,
+                0,
+                50,
+                Keys
+            };
+            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellWaiting", Params);
+            return Result;
+        }
+        public static async Task<JRCtler.JsonRpcRes> TellStopped()
+        {
+            string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
+            ArrayList Params = new ArrayList
+            {
+                "token:" + Stc.GloConf.rpc_secret,
+                0,
+                50,
+                Keys
+            };
+            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellStopped", Params);
+            return Result;
+        }
+        public static async Task<JRCtler.JsonRpcRes> GetFiles(string Gid)
+        {
+            ArrayList Params = new ArrayList
+            {
+                "token:" + Stc.GloConf.rpc_secret,
+                Gid
+            };
+            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.getFiles", Params);
+            return Result;
+        }
+
         public static async Task<JRCtler.JsonRpcRes> GetGlobalStat()
         {
             ArrayList Params = new ArrayList

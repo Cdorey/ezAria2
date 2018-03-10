@@ -13,21 +13,28 @@ namespace test
     {
         static void Main()
         {
-            string Completed = "1312489472";
-            string Total = "8694792192";
-            double Progress;
-            if (Total == "0")
+            int a = 0;
+            for(int i=0; i<10; i++)
             {
-                Progress = 0;
+                Console.WriteLine("成绩多少？");
+                int s = int.Parse(Console.ReadLine());
+                if (s>80)
+                {
+                    a++;
+                }
+            }
+            if (a > 8)
+            {
+                Console.WriteLine("超过80%");
+            }
+            else if (a > 6)
+            {
+                Console.WriteLine("超过60%");
             }
             else
             {
-                double i = long.Parse(Completed)*100/long.Parse(Total);
-                Progress = i;
+                Console.WriteLine("再接再厉");
             }
-            Console.WriteLine(Progress);
-            Console.WriteLine(long.Parse(Completed));
-            Console.WriteLine(long.Parse(Total));
 
             Console.ReadLine();
         }

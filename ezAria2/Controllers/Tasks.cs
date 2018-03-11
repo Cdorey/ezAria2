@@ -427,7 +427,7 @@ namespace ezAria2
             return Result;
 
         }
-        public static async Task ShutDown()
+        public static async void ShutDown()
         {
             ArrayList Params = new ArrayList
             {

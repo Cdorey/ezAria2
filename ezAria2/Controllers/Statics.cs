@@ -11,12 +11,9 @@ namespace ezAria2
         public static ConfigInformation GloConf;
         public static ProgressController ProCtl;
         static Process Aria2Process;
-        public static void Quit()
+        public static void Quit(object sender,ExitEventArgs e)
         {
-            Task.Factory.StartNew(async () =>
-            {
-                await Aria2Methords.ShutDown();
-            });
+            //Aria2Methords.ShutDown();
             Aria2Process.Kill();
         }
         static Stc()
@@ -46,6 +43,7 @@ namespace ezAria2
 
             Line = new JRCtler(string.Format("ws://127.0.0.1:{0}/jsonrpc", GloConf.rpc_listen_port));
             ProCtl = new ProgressController();
+            Application.Current.Exit += new ExitEventHandler(Quit);
 
         }
         ~Stc()

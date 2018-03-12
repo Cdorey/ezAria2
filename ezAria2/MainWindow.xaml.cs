@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Threading;
 using System.Xml.Linq;
 
 namespace ezAria2
@@ -13,7 +14,7 @@ namespace ezAria2
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+        DispatcherTimer dispatcherTimer = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
@@ -29,7 +30,7 @@ namespace ezAria2
             set.Show();
         }
 
-        private void ListRefresh(object sender, System.EventArgs e)
+        private void ListRefresh(object sender, EventArgs e)
         {
             ((TaskList)FindResource("TaskData")).Update();
         }
@@ -43,7 +44,7 @@ namespace ezAria2
 
         private void MetroBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void MetroBorder_MouseLeftButtonUp_NewTask(object sender, System.Windows.Input.MouseButtonEventArgs e)

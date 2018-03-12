@@ -13,7 +13,6 @@ namespace ezAria2
         static Process Aria2Process;
         public static void Quit(object sender,ExitEventArgs e)
         {
-            //Aria2Methords.ShutDown();
             Aria2Process.Kill();
         }
         static Stc()
@@ -41,7 +40,7 @@ namespace ezAria2
             Aria2Process.Start();
             Stc.GloConf = Start.Configs;//给全局配置变量赋值，同时初始化所有其他全局变量
 
-            Line = new JRCtler(string.Format("ws://127.0.0.1:{0}/jsonrpc", GloConf.rpc_listen_port));
+            Line = new JRCtler(string.Format("ws://127.0.0.1:{0}/jsonrpc", GloConf.rpc_listen_port));//这里的逻辑重新梳理后，可以允许ezAria2作为客户端，控制其他主机的下载服务
             ProCtl = new ProgressController();
             Application.Current.Exit += new ExitEventHandler(Quit);
 

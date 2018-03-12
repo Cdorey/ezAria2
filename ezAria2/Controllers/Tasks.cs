@@ -179,7 +179,6 @@ namespace ezAria2
         public HistoryList()//任务列表的构造函数，实际使用时应当修改
         {
         }
-
     }
     public class JRCtler
     {

@@ -166,6 +166,8 @@
     <Content Include="aria2c.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="MainIcon.ico" />
+    <Resource Include="Resources\forward-2831368_640.png" />
     <Resource Include="Resources\bonfire-1849089_640.png" />
     <Resource Include="Resources\cup-1849083_640.png" />
     <Resource Include="Resources\stopwatch-1849088_640.png" />
@@ -177,9 +179,6 @@
     <Resource Include="Resources\cloud-2044797_640.png" />
     <Resource Include="Resources\cloud-2044820_640.png" />
     <Resource Include="Resources\cloud-2044822_640.png" />
-    <Resource Include="config.xml">
-      <SubType>Designer</SubType>
-    </Resource>
     <Resource Include="Resources\editIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

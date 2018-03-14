@@ -4,5 +4,7 @@
              xmlns:local="clr-namespace:ezAria2"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <local:TaskList x:Key="TaskData"/>
+        <local:HistoryList x:Key="HistoryData"/>
     </Application.Resources>
 </Application>

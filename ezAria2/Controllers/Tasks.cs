@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using WebSocketSharp;
 
 namespace ezAria2
@@ -14,10 +15,15 @@ namespace ezAria2
     public class TaskLite//小型任务对象,用于任务列表
     {
         public string State { get; set; }//任务的状态
+
         public string Icon { get; set; }//下载文件的图标
+
         public string Speed { get; set; }//当前速度
+
         public double Progress { get; set; } //进度，双精度浮点数
+
         public string FileName { get; set; }//下载的文件名
+
         public string Gid { get; set; }//任务的GID
 
         public async void GetFileInfo()
@@ -30,6 +36,7 @@ namespace ezAria2
             //    FileName = FileName + "等";
             //}
         }
+
         public async Task Refresh()
         {
             JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
@@ -76,6 +83,24 @@ namespace ezAria2
             }
         }
 
+        public void StateChangeFunction()
+        {
+            StateChange();
+        }
+        private async void StateChange()
+        {
+            if(State=="none")
+            {
+                await Aria2Methords.Pause(Gid);
+                State = "error";
+            }
+            else
+            {
+                await Aria2Methords.UpPause(Gid);
+                State = "none";
+            }
+        }
+
         public TaskLite(JRCtler.JsonRpcRes e)
         {
 
@@ -106,8 +131,24 @@ namespace ezAria2
                     State = "wait";
                     Icon = "Resources/stopwatch-1849088_640.png";
                     break;
-                default:
+                case "paused":
                     State = "error";
+                    Icon = "Resources/cup-1849083_640.png";
+                    break;
+                case "error":
+                    State = "error";
+                    Icon = "Resources/cup-1849083_640.png";
+                    break;
+                case "complete":
+                    State = "none";
+                    Icon = "Resources/stopwatch-1849088_640.png";
+                    break;
+                case "removed":
+                    State = "error";
+                    Icon = "Resources/cup-1849083_640.png";
+                    break;
+                default:
+                    State = "wait";
                     Icon = "Resources/cup-1849083_640.png";
                     break;
             }
@@ -327,12 +368,10 @@ namespace ezAria2
         }
         public static async Task<string> Pause(string Gid)
         {
-            string[] Gids = new string[1];
-            Gids[0] = Gid;
             ArrayList Params = new ArrayList
             {
                 "token:" + Stc.GloConf.rpc_secret,
-                Gids
+                Gid
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.pause", Params)).Result;
             return Result;
@@ -344,6 +383,24 @@ namespace ezAria2
                 "token:" + Stc.GloConf.rpc_secret,
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.pauseAll", Params)).Result;
+        }
+        public static async Task<string> UpPause(string Gid)
+        {
+            ArrayList Params = new ArrayList
+            {
+                "token:" + Stc.GloConf.rpc_secret,
+                Gid
+            };
+            string Result = (await Stc.Line.JsonRpcAsync("aria2.unpause", Params)).Result;
+            return Result;
+        }
+        public static async Task UpPauseAll()
+        {
+            ArrayList Params = new ArrayList
+            {
+                "token:" + Stc.GloConf.rpc_secret,
+            };
+            string Result = (await Stc.Line.JsonRpcAsync("aria2.unpauseAll", Params)).Result;
         }
         public static async Task<JRCtler.JsonRpcRes> TellStatus(string Gid)
         {

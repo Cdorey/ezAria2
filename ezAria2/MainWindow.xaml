@@ -21,8 +21,6 @@
         </Metro:MetroContextMenu>
     </Metro:MetroWindow.ContextMenu>-->
     <Window.Resources>
-        <local:TaskList x:Key="TaskData"/>
-        <local:HistoryList x:Key="HistoryData"/>
     </Window.Resources>
     <Grid>
         <Metro:MetroMenuTabControl Margin="0" FontSize="18" IsHitTestVisible="True" IconMode="True">
@@ -36,7 +34,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Metro:MetroGroupBox Header="正在进行中的任务" Margin="0,10" FontSize="12">
-                        <ListBox HorizontalContentAlignment="Stretch"  ItemsSource="{Binding Source={StaticResource TaskData},Mode=OneWay}" Margin="0,0,0,10">
+                        <ListBox x:Name="TasksInProgress" HorizontalContentAlignment="Stretch"  ItemsSource="{Binding Source={StaticResource TaskData},Mode=OneWay}" Margin="0,0,0,10">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -61,7 +59,7 @@
                         <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50" MouseLeftButtonUp="MetroBorder_MouseLeftButtonUp_NewTask">
                             <Metro:MetroImage Source="Resources/play-1073616_640.png"  />
                         </Metro:MetroBorder>
-                        <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50">
+                        <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50" MouseLeftButtonUp="MetroBorder_MouseLeftButtonUp_StateChange">
                             <Metro:MetroImage Source="Resources/cloud-2044820_640.png"  />
                         </Metro:MetroBorder>
                         <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50">

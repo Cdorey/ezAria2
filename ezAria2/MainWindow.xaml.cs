@@ -18,10 +18,10 @@ namespace ezAria2
         public MainWindow()
         {
             InitializeComponent();
+            ((TaskList)FindResource("TaskData")).Refresh();
             dispatcherTimer.Tick += new EventHandler(ListRefresh);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 2);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
-
         }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
@@ -59,7 +59,14 @@ namespace ezAria2
 
         private void MetroWindow_Activated(object sender, EventArgs e)
         {
-            ((TaskList)this.FindResource("TaskData")).Refresh();
+        }
+
+        private void MetroBorder_MouseLeftButtonUp_StateChange(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if(TasksInProgress.SelectedItem!=null)
+            {
+                ((TaskLite)TasksInProgress.SelectedItem).StateChangeFunction();
+            }
         }
     }
 }

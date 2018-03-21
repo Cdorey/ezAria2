@@ -59,8 +59,13 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>MainIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -196,11 +201,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Arthas-WPFUI\Arthas\Arthas.csproj">
+    <ProjectReference Include="..\toolkit\Arthas\Arthas.csproj">
       <Project>{f5dbbc65-f7d3-4a0d-8a9f-3dafd3deb7ed}</Project>
       <Name>Arthas</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\websocket-sharp\websocket-sharp\websocket-sharp.csproj">
+    <ProjectReference Include="..\toolkit\websocket-sharp\websocket-sharp.csproj">
       <Project>{b357bac7-529e-4d81-a0d2-71041b19c8de}</Project>
       <Name>websocket-sharp</Name>
     </ProjectReference>

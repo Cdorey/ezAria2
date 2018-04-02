@@ -14,14 +14,11 @@ namespace ezAria2
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        DispatcherTimer dispatcherTimer = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
             ((TaskList)FindResource("TaskData")).Refresh();
-            dispatcherTimer.Tick += new EventHandler(ListRefresh);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            dispatcherTimer.Start();
+            Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
         }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
@@ -30,9 +27,11 @@ namespace ezAria2
             set.Show();
         }
 
-        private void ListRefresh(object sender, EventArgs e)
+        private async void ListRefresh(object sender, EventArgs e)
         {
-            ((TaskList)FindResource("TaskData")).Update();
+            Stc.dispatcherTimer.Tick -= new EventHandler(ListRefresh);
+            await ((TaskList)FindResource("TaskData")).Update();
+            Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
         }
 
 

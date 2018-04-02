@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace ezAria2
 {
-    public class ProgressController
+    public class ProgressController//这个类控制托盘按钮
     {
         private NotifyIcon NotifyIcon;
         private void InitialTray()
@@ -36,9 +36,13 @@ namespace ezAria2
         {
             InitialTray();
         }
-        ~ProgressController()
+        public void Dispose()
         {
             NotifyIcon.Dispose();
+        }
+        ~ProgressController()
+        {
+            Dispose();
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace ezAria2
 {
@@ -11,10 +13,13 @@ namespace ezAria2
         public static ConfigInformation GloConf;
         public static ProgressController ProCtl;
         static Process Aria2Process;
-        public static void Quit(object sender,ExitEventArgs e)
+        public static DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        public static void Quit(object sender,ExitEventArgs e)//程序关闭事件
         {
             Aria2Process.Kill();
+            ProCtl.Dispose();
         }
+
         static Stc()
         {
             ConfigController Start = new ConfigController();
@@ -43,7 +48,8 @@ namespace ezAria2
             Line = new JRCtler(string.Format("ws://127.0.0.1:{0}/jsonrpc", GloConf.rpc_listen_port));//这里的逻辑重新梳理后，可以允许ezAria2作为客户端，控制其他主机的下载服务
             ProCtl = new ProgressController();
             Application.Current.Exit += new ExitEventHandler(Quit);
-
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
         }
         ~Stc()
         {

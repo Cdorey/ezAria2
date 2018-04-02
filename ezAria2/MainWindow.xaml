@@ -83,7 +83,6 @@
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="40px"/>
-                                            <ColumnDefinition Width="5*"/>
                                             <ColumnDefinition Width="1*"/>
                                             <ColumnDefinition Width="40px"/>
                                             <ColumnDefinition Width="40px"/>
@@ -92,13 +91,10 @@
                                         </Grid.ColumnDefinitions>
 
                                         <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
-                                        <Metro:MetroProgressBar Value="{Binding Progress}" ProgressBarHeight="25" VerticalAlignment="Center" Grid.Column="1" Grid.ColumnSpan="2" Opacity="0.3"/>
                                         <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="1"/>
-                                        <Metro:MetroTextBlock Text="{Binding Speed}" FontSize="18" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Right" FontStyle="Italic"/>
-                                        <Metro:MetroImage Content="MetroImage" Source="Resources/editIcon.png" ImageHeight="40" ImageWidth="40" Grid.Column="3"/>
-                                        <Metro:MetroImage Content="MetroImage" Source="Resources/editIcon.png" ImageHeight="40" ImageWidth="40" Grid.Column="4"/>
-                                        <Metro:MetroImage Content="MetroImage" Source="Resources/editIcon.png" ImageHeight="40" ImageWidth="40" Grid.Column="5"/>
-                                        <Metro:MetroImage Content="MetroImage" Source="Resources/editIcon.png" ImageHeight="40" ImageWidth="40" Grid.Column="6"/>
+                                        <Metro:MetroTextBlock  Text="完成时间：" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2"/>
+                                        <Metro:MetroTextBlock  Text="{Binding CompletedTime}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="3"/>
+                                        <Metro:MetroTextBlock  Text="{Binding FileSize}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="3"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

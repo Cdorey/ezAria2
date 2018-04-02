@@ -11,7 +11,6 @@ using WebSocketSharp;
 
 namespace ezAria2
 {
-    //这里应该有，单个任务的类、任务列表的类、历史列表的类、单个RPC请求的类、单个RPC消息的类、RPC控制器
     public class TaskLite//小型任务对象,用于任务列表
     {
         public string State { get; set; }//任务的状态
@@ -37,7 +36,7 @@ namespace ezAria2
             //}
         }
 
-        public async Task Refresh()
+        public async Task<string> Refresh()//这个方法能返回任务状态
         {
             JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
             string Completed = e.Result.completedLength;
@@ -81,6 +80,7 @@ namespace ezAria2
                 double i = long.Parse(Completed) * 100 / long.Parse(Total);
                 Progress = i;
             }
+            return Status;
         }
 
         public void StateChangeFunction()
@@ -169,6 +169,7 @@ namespace ezAria2
         {
         }
     }
+
     public class TaskList : ObservableCollection<TaskLite>//任务列表
     {
         public TaskList()
@@ -206,22 +207,59 @@ namespace ezAria2
             //}
 
         }
-        public async void Update()
+        public async Task Update()//历遍单个任务，调用其刷新方法
         {
             foreach (TaskLite s in this)
             {
-                await s.Refresh();
+                string Statu= await s.Refresh();
+                if (Statu== "complete"||Statu== "complete")
+                {
+                    Remove(s);
+                }
             }
             OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
         }
     }
-    public class HistoryList : ObservableCollection<Task>
+
+    public class FinishedTask//已完成任务
+    {
+        public string Icon { get; set; }//下载文件的图标
+
+        public string FileName { get; set; }//下载的文件名
+
+        public string Gid { get; set; }//任务的GID
+
+        public async void GetFileInfo()
+        {
+            JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
+            string uri = x.Result[0].uris[0].uri;
+            FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
+            //if (x.Result.GetLength(0)!=1)
+            //{
+            //    FileName = FileName + "等";
+            //}
+        }
+
+        public string Path { get; set; }//文件路径
+
+        public string CompletedTime { get; set; }//完成时间
+
+        public string FileSize { get; set; }//文件尺寸
+
+        public FinishedTask(TaskLite Sender)
+        {
+
+        }
+    }
+
+    public class HistoryList : ObservableCollection<FinishedTask>
     {
         public HistoryList()//任务列表的构造函数，实际使用时应当修改
         {
         }
     }
-    public class JRCtler
+
+    public class JRCtler//JsonRpc控制器，基于WebSocket
     {
         private class JsonRpcReq//一个请求消息对象
         {
@@ -240,6 +278,7 @@ namespace ezAria2
                 Params = e;
             }
         }
+
         public class JsonRpcRes//一个回复消息对象
         {
             [JsonProperty(PropertyName = "jsonrpc")]
@@ -266,10 +305,13 @@ namespace ezAria2
                 Id = -1;
             }
         }
-        //资源列表
+
         private int Idlist = 1;//请求的ID序列号
+
         private Dictionary<int, JsonRpcRes> RespondList = new Dictionary<int, JsonRpcRes>();//ID-JsonRpcRes字典
+
         private WebSocket ws;//JsonRpc调用所使用的WebSocket链路
+
         public Queue<JsonRpcRes> NoticeList = new Queue<JsonRpcRes>();//通知列表
 
         //私有方法
@@ -283,6 +325,7 @@ namespace ezAria2
             //string Logs = File.ReadAllText(@"log.txt") +"send:"+ JsonConvert.SerializeObject(SendMessage) + Environment.NewLine;
             //File.WriteAllText(@"log.txt", Logs);
         }
+
         private void JsonRpcMessage(string Message)//收消息
         {
             JsonRpcRes NewMessage = JsonConvert.DeserializeObject<JsonRpcRes>(Message);
@@ -332,8 +375,16 @@ namespace ezAria2
             };
         }
     }
-    public static class Aria2Methords
+
+    public static class Aria2Methords//Aria2 Rpc接口的方法库
     {
+        private static string Base64Encode(FileStream File)
+        {
+            byte[] bt = new byte[File.Length];
+            File.Read(bt, 0, bt.Length);
+            return Convert.ToBase64String(bt);
+        }
+
         public static async Task<string> AddUri(string Uri)
         {
             string[] Uris = new string[] { Uri };
@@ -345,6 +396,7 @@ namespace ezAria2
             string Gid = (await Stc.Line.JsonRpcAsync("aria2.addUri", Params)).Result;
             return Gid;
         }
+
         public static async Task<string> AddUri(string[] Uris)
         {
             ArrayList Params = new ArrayList
@@ -355,6 +407,31 @@ namespace ezAria2
             string Gid = (await Stc.Line.JsonRpcAsync("aria2.addUri", Params)).Result;
             return Gid;
         }
+
+        public static async Task<string> AddTorrent(FileStream File)//添加种子
+        {
+            string TorrentBase64 = Base64Encode(File);
+            ArrayList Params = new ArrayList
+            {
+                "token:" + Stc.GloConf.rpc_secret,
+                TorrentBase64
+            };
+            string Gid = (await Stc.Line.JsonRpcAsync("aria2.addTorrent", Params)).Result;
+            return Gid;
+        }
+
+        public static async Task<string> AddMetalink(FileStream File)//添加MetaLink
+        {
+            string MetalinkBase64 = Base64Encode(File);
+            ArrayList Params = new ArrayList
+            {
+                "token:" + Stc.GloConf.rpc_secret,
+                MetalinkBase64
+            };
+            string Gid = (await Stc.Line.JsonRpcAsync("aria2.addMetalink", Params)).Result;
+            return Gid;
+        }
+
         public static async Task<string> Remove(string Gid)
         {
             string[] Gids = new string[] { Gid };
@@ -366,6 +443,7 @@ namespace ezAria2
             string Result = (await Stc.Line.JsonRpcAsync("aria2.remove", Params)).Result;
             return Result;
         }
+
         public static async Task<string> Pause(string Gid)
         {
             ArrayList Params = new ArrayList
@@ -376,6 +454,7 @@ namespace ezAria2
             string Result = (await Stc.Line.JsonRpcAsync("aria2.pause", Params)).Result;
             return Result;
         }
+
         public static async Task PauseAll()
         {
             ArrayList Params = new ArrayList
@@ -384,6 +463,7 @@ namespace ezAria2
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.pauseAll", Params)).Result;
         }
+
         public static async Task<string> UpPause(string Gid)
         {
             ArrayList Params = new ArrayList
@@ -394,6 +474,7 @@ namespace ezAria2
             string Result = (await Stc.Line.JsonRpcAsync("aria2.unpause", Params)).Result;
             return Result;
         }
+
         public static async Task UpPauseAll()
         {
             ArrayList Params = new ArrayList
@@ -402,6 +483,7 @@ namespace ezAria2
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.unpauseAll", Params)).Result;
         }
+
         public static async Task<JRCtler.JsonRpcRes> TellStatus(string Gid)
         {
             string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
@@ -414,6 +496,7 @@ namespace ezAria2
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellStatus", Params);
             return Result;
         }
+
         public static async Task<JRCtler.JsonRpcRes> TellStatus(string Gid, string[] Keys)
         {
             ArrayList Params = new ArrayList
@@ -425,6 +508,7 @@ namespace ezAria2
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellStatus", Params);
             return Result;
         }
+
         public static async Task<JRCtler.JsonRpcRes> TellActive()
         {
             string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
@@ -436,6 +520,7 @@ namespace ezAria2
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellActive", Params);
             return Result;
         }
+
         public static async Task<JRCtler.JsonRpcRes> TellWaiting()
         {
             string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
@@ -449,6 +534,7 @@ namespace ezAria2
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellWaiting", Params);
             return Result;
         }
+
         public static async Task<JRCtler.JsonRpcRes> TellStopped()
         {
             string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
@@ -462,6 +548,7 @@ namespace ezAria2
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellStopped", Params);
             return Result;
         }
+
         public static async Task<JRCtler.JsonRpcRes> GetFiles(string Gid)
         {
             ArrayList Params = new ArrayList
@@ -483,6 +570,7 @@ namespace ezAria2
             return Result;
 
         }
+
         public static async void ShutDown()
         {
             ArrayList Params = new ArrayList
@@ -493,4 +581,5 @@ namespace ezAria2
         }
 
     }
+
 }

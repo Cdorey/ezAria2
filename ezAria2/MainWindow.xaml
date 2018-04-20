@@ -55,10 +55,12 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Metro:MetroGroupBox>
-                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="5" HorizontalAlignment="Center">
-                        <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50" MouseLeftButtonUp="MetroBorder_MouseLeftButtonUp_NewTask">
-                            <Metro:MetroImage Source="Resources/play-1073616_640.png"  />
-                        </Metro:MetroBorder>
+                    <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+                        <Button Width="70" Height="70" Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click">
+                            <Border BorderBrush="#FF667991" BorderThickness="3" CornerRadius="50" >
+                                <Metro:MetroImage Source="Resources/play-1073616_640.png"  />
+                            </Border>
+                        </Button>
                         <Metro:MetroBorder BorderBrush="#FF667991" Margin="20,0" BorderThickness="3" Width="70" Height="70" CornerRadius="50" MouseLeftButtonUp="MetroBorder_MouseLeftButtonUp_StateChange">
                             <Metro:MetroImage Source="Resources/cloud-2044820_640.png"  />
                         </Metro:MetroBorder>

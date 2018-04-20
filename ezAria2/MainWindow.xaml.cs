@@ -17,21 +17,31 @@ namespace ezAria2
         public MainWindow()
         {
             InitializeComponent();
-            ((TaskList)FindResource("TaskData")).Refresh();
+            Stc.TaskData.Refresh();
             Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
-        }
+            Stc.TaskData.TaskFinished += Stc.HistoryData.TaskCompleted;
+            Binding TaskDataBinding = new Binding();
+            TaskDataBinding.Source = Stc.TaskData;
+    }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
         {
             Settings set = new Settings();
             set.Show();
+
         }
 
         private async void ListRefresh(object sender, EventArgs e)
         {
             Stc.dispatcherTimer.Tick -= new EventHandler(ListRefresh);
-            await ((TaskList)FindResource("TaskData")).Update();
-            Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
+            try
+            {
+                await Stc.TaskData.Update();
+            }
+            finally
+            {
+                Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
+            }
         }
 
 
@@ -66,6 +76,12 @@ namespace ezAria2
             {
                 ((TaskLite)TasksInProgress.SelectedItem).StateChangeFunction();
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            AddTask Task = new AddTask();
+            Task.Show();
         }
     }
 }

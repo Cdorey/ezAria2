@@ -14,6 +14,8 @@ namespace ezAria2
         public static ProgressController ProCtl;
         static Process Aria2Process;
         public static DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        public static TaskList TaskData;
+        public static HistoryList HistoryData;
         public static void Quit(object sender,ExitEventArgs e)//程序关闭事件
         {
             Aria2Process.Kill();
@@ -36,6 +38,7 @@ namespace ezAria2
             {
                 Directory.CreateDirectory(Start.Configs.dir);
             }
+
             Start.Make();
             Aria2Process = new Process();
             Aria2Process.StartInfo.FileName = @"aria2c.exe";
@@ -50,6 +53,8 @@ namespace ezAria2
             Application.Current.Exit += new ExitEventHandler(Quit);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
+            TaskData = new TaskList();
+            HistoryData = new HistoryList();
         }
         ~Stc()
         {

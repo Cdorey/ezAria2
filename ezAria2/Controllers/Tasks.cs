@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -15,6 +16,8 @@ namespace ezAria2
     {
         public string State { get; set; }//任务的状态
 
+        public string Status { get; set; }//aria2c返回的任务状态，包含更多信息
+
         public string Icon { get; set; }//下载文件的图标
 
         public string Speed { get; set; }//当前速度
@@ -24,6 +27,10 @@ namespace ezAria2
         public string FileName { get; set; }//下载的文件名
 
         public string Gid { get; set; }//任务的GID
+
+        public string Completed { get; set; }//已完成的尺寸
+
+        public string Total { get; set; }//任务的尺寸
 
         public async void GetFileInfo()
         {
@@ -36,57 +43,17 @@ namespace ezAria2
             //}
         }
 
-        public async Task<string> Refresh()//这个方法能返回任务状态
+        public async Task Refresh()
         {
             JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
-            string Completed = e.Result.completedLength;
-            string Total = e.Result.totalLength;
-            string Status = e.Result.status;
-            string SpeedString = e.Result.downloadSpeed;
-            double SpeedLong = double.Parse(SpeedString);
-            if (SpeedLong / 1024 == 0)
-            {
-                Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
-            }
-            else if (SpeedLong / 1048576 == 0)
-            {
-                Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
-            }
-            else
-            {
-                Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
-            }
-            switch (Status)
-            {
-                case "active":
-                    State = "none";
-                    Icon = "Resources/bonfire-1849089_640.png";
-                    break;
-                case "waiting":
-                    State = "wait";
-                    Icon = "Resources/stopwatch-1849088_640.png";
-                    break;
-                default:
-                    State = "error";
-                    Icon = "Resources/cup-1849083_640.png";
-                    break;
-            }
-            if (e.Result.totalLength == 0)
-            {
-                Progress = 0;
-            }
-            else
-            {
-                double i = long.Parse(Completed) * 100 / long.Parse(Total);
-                Progress = i;
-            }
-            return Status;
+            InformationRefresh(e);
         }
 
         public void StateChangeFunction()
         {
             StateChange();
         }
+
         private async void StateChange()
         {
             if(State=="none")
@@ -101,25 +68,24 @@ namespace ezAria2
             }
         }
 
-        public TaskLite(JRCtler.JsonRpcRes e)
+        private void InformationRefresh(JRCtler.JsonRpcRes e)
         {
-
-            string Completed = e.Result.completedLength;
-            string Total = e.Result.totalLength;
+            Completed = e.Result.completedLength;
+            Total = e.Result.totalLength;
             string Status = e.Result.status;
             string SpeedString = e.Result.downloadSpeed;
             double SpeedLong = double.Parse(SpeedString);
-            if (SpeedLong/1024==0)
+            if (SpeedLong / 1024 == 0)
             {
-                Speed = Math.Round(SpeedLong,2).ToString() + "B/S";
+                Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
             }
-            else if(SpeedLong / 1048576 == 0)
+            else if (SpeedLong / 1048576 == 0)
             {
-                Speed = Math.Round((SpeedLong / 1024),2).ToString() + "KB/S";
+                Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
             }
             else
             {
-                Speed = Math.Round((SpeedLong / 1048578),2).ToString() + "MB/S";
+                Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
             }
             switch (Status)
             {
@@ -158,24 +124,26 @@ namespace ezAria2
             }
             else
             {
-                double i = long.Parse(Completed)*100 / long.Parse(Total);
+                double i = long.Parse(Completed) * 100 / long.Parse(Total);
                 Progress = i;
             }
             Gid = e.Result.gid;
             GetFileInfo();
         }
 
-        public TaskLite()
+        public TaskLite(JRCtler.JsonRpcRes e)//构造函数
         {
+            InformationRefresh(e);
         }
     }
 
     public class TaskList : ObservableCollection<TaskLite>//任务列表
     {
-        public TaskList()
-        {
-        }
-        public async void Refresh()
+        public delegate void TaskFinish(TaskLite e);
+
+        public event TaskFinish TaskFinished;
+
+        public async void Refresh()//清除并刷新任务列表
         {
             Clear();
             JRCtler.JsonRpcRes x = await Aria2Methords.TellActive();
@@ -196,66 +164,111 @@ namespace ezAria2
                 };
                 Add(new TaskLite(a));
             }
-            //JRCtler.JsonRpcRes z = await Aria2Methords.TellStopped();
-            //foreach (dynamic s in z.Result)
-            //{
-            //    JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
-            //    {
-            //        Result = s
-            //    };
-            //    Add(new TaskLite(a));
-            //}
+            JRCtler.JsonRpcRes z = await Aria2Methords.TellStopped();
+            foreach (dynamic s in z.Result)
+            {
+                JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
+                {
+                    Result = s
+                };
+                string Status = a.Result.status;
+                if (Status!= "complete")
+                {
+                    Add(new TaskLite(a));
+                }
+                else
+                {
+                    TaskFinished?.Invoke(new TaskLite(a));
+                }
+            }
 
         }
+
         public async Task Update()//历遍单个任务，调用其刷新方法
         {
             foreach (TaskLite s in this)
             {
-                string Statu= await s.Refresh();
-                if (Statu== "complete"||Statu== "complete")
+                if (s.Status== "complete")
                 {
                     Remove(s);
+                    break;
                 }
+                await s.Refresh();
             }
             OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
         }
+
     }
 
     public class FinishedTask//已完成任务
     {
-        public string Icon { get; set; }//下载文件的图标
+        private async void GetInfo(string TaskGid)
+        {
+            string[] keys = new string[3];
+            keys[0] = "dir";
+            keys[1] = "totalLength";
+            keys[2] = "path";
+            var x = await Aria2Methords.TellStatus(TaskGid, keys);
+            Path = x.Result.path;
+            FileName = Path.Substring(Path.LastIndexOf(@"/"));
+            FileSize = x.Result.totalLength;
+            Icon = System.Drawing.Icon.ExtractAssociatedIcon(Path);
+        }
+
+        public System.Drawing.Icon Icon { get; set; }//下载文件的图标
 
         public string FileName { get; set; }//下载的文件名
 
         public string Gid { get; set; }//任务的GID
 
-        public async void GetFileInfo()
-        {
-            JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
-            string uri = x.Result[0].uris[0].uri;
-            FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
-            //if (x.Result.GetLength(0)!=1)
-            //{
-            //    FileName = FileName + "等";
-            //}
-        }
-
         public string Path { get; set; }//文件路径
-
-        public string CompletedTime { get; set; }//完成时间
 
         public string FileSize { get; set; }//文件尺寸
 
-        public FinishedTask(TaskLite Sender)
+        public FinishedTask(TaskLite e)
         {
-
+            Gid = e.Gid;
+            GetInfo(Gid);
         }
+        public FinishedTask(string Gid)
+        {
+            GetInfo(Gid);
+        }
+
     }
 
-    public class HistoryList : ObservableCollection<FinishedTask>
+    public class HistoryList : ObservableCollection<FinishedTask>//历史任务列表
     {
+        private string Historys;
+
+        private void Save(Object Sender, EventArgs e)
+        {
+            File.WriteAllText(@"HistoryList.log", Historys);
+        }
+
+
+        private void Load()
+        {
+            if (!File.Exists(@"HistoryList.log"))
+            {
+                File.Create(@"HistoryList.log");
+            }
+            Historys = File.ReadAllText(@"HistoryList.log");
+        }
+
+        public void TaskCompleted(TaskLite e)
+        {
+            FinishedTask a = new FinishedTask(e);
+            if(!Contains(a))
+            {
+                Add(a);
+            }
+        }
+
         public HistoryList()//任务列表的构造函数，实际使用时应当修改
         {
+            //Load();
+            //CollectionChanged += Save;
         }
     }
 
@@ -306,6 +319,7 @@ namespace ezAria2
             }
         }
 
+        //资源列表
         private int Idlist = 1;//请求的ID序列号
 
         private Dictionary<int, JsonRpcRes> RespondList = new Dictionary<int, JsonRpcRes>();//ID-JsonRpcRes字典

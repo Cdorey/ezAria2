@@ -26,7 +26,6 @@ namespace ezAria2
         private void MetroButton_Click_Add(object sender, RoutedEventArgs e)
         {
             Add();
-            ((TaskList)FindResource("TaskData")).Refresh();
             Close();
         }
 

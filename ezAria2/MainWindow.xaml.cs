@@ -17,11 +17,13 @@ namespace ezAria2
         public MainWindow()
         {
             InitializeComponent();
-            Stc.TaskData.Refresh();
             Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
             Stc.TaskData.TaskFinished += Stc.HistoryData.TaskCompleted;
-            Binding TaskDataBinding = new Binding();
-            TaskDataBinding.Source = Stc.TaskData;
+            //Binding TaskDataBinding = new Binding();
+            //TaskDataBinding.Source = Stc.TaskData;
+            //TaskDataBinding.Mode = BindingMode.OneWay;
+            TasksInProgress.ItemsSource = Stc.TaskData;
+            FinishedList.ItemsSource = Stc.HistoryData;
     }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)

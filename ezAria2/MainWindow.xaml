@@ -34,7 +34,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Metro:MetroGroupBox Header="正在进行中的任务" Margin="0,10" FontSize="12">
-                        <ListBox x:Name="TasksInProgress" HorizontalContentAlignment="Stretch"  ItemsSource="{Binding Source={StaticResource TaskData},Mode=OneWay}" Margin="0,0,0,10">
+                        <ListBox x:Name="TasksInProgress" HorizontalContentAlignment="Stretch"  Margin="0,0,0,10">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -76,7 +76,7 @@
             <Metro:MetroMenuTabItem Icon="Resources/store-1103556_640.png" Header="下载历史" Foreground="Gray" IconMove="Resources/store-1103556_640.png" >
                 <Grid Background="#FFE5E5E5">
                     <Metro:MetroGroupBox Header="已经完成的下载" Margin="0,10" FontSize="12">
-                        <ListBox HorizontalContentAlignment="Stretch"  ItemsSource="{Binding Source={StaticResource HistoryData},Mode=OneWay}" Margin="0,0,0,10">
+                        <ListBox x:Name="FinishedList" HorizontalContentAlignment="Stretch" Margin="0,0,0,10">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -94,8 +94,8 @@
 
                                         <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
                                         <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="1"/>
-                                        <Metro:MetroTextBlock  Text="完成时间：" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2"/>
-                                        <Metro:MetroTextBlock  Text="{Binding CompletedTime}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="3"/>
+                                        <!--<Metro:MetroTextBlock  Text="完成时间：" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2"/>
+                                        <Metro:MetroTextBlock  Text="{Binding CompletedTime}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="3"/>-->
                                         <Metro:MetroTextBlock  Text="{Binding FileSize}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="3"/>
                                     </Grid>
                                 </DataTemplate>

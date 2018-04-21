@@ -14,6 +14,10 @@ namespace ezAria2
 {
     public class TaskLite//小型任务对象,用于任务列表
     {
+        public delegate void TaskFinish(TaskLite e);
+
+        public event TaskFinish TaskFinished;//当前任务的status变成completed时触发
+
         public string State { get; set; }//任务的状态
 
         public string Status { get; set; }//aria2c返回的任务状态，包含更多信息
@@ -32,18 +36,18 @@ namespace ezAria2
 
         public string Total { get; set; }//任务的尺寸
 
-        public async void GetFileInfo()
+        public async void GetFileInfo()//获得文件信息
         {
             JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
             string uri = x.Result[0].uris[0].uri;
             FileName=uri.Substring(uri.LastIndexOf(@"/")+1);
-            //if (x.Result.GetLength(0)!=1)
+            //if (x.Result.GetLength(0) != 1)
             //{
             //    FileName = FileName + "等";
             //}
         }
 
-        public async Task Refresh()
+        public async Task Refresh()//刷新任务状态
         {
             JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
             InformationRefresh(e);
@@ -108,6 +112,7 @@ namespace ezAria2
                 case "complete":
                     State = "none";
                     Icon = "Resources/stopwatch-1849088_640.png";
+                    TaskFinished?.Invoke(this);
                     break;
                 case "removed":
                     State = "error";
@@ -141,99 +146,90 @@ namespace ezAria2
     {
         public delegate void TaskFinish(TaskLite e);
 
-        public event TaskFinish TaskFinished;
+        public event TaskFinish TaskFinished;//有任务状态为completed时触发
 
-        public async void Refresh()//清除并刷新任务列表
+        private Queue<TaskLite> FinishedTaskList=new Queue<TaskLite>();//该队列内容为已完成待移除的任务
+
+        private List<string> GidList = new List<string>();//该列表用于存储已经添加过的任务GID，避免重复添加
+
+        private void RemoveTask(TaskLite e)//当任务完成后移除并触发任务列表的TaskFinish事件
         {
-            Clear();
-            JRCtler.JsonRpcRes x = await Aria2Methords.TellActive();
-            foreach (dynamic s in x.Result)
-            {
-                JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
-                {
-                    Result = s
-                };
-                Add(new TaskLite(a));
-            }
-            JRCtler.JsonRpcRes y = await Aria2Methords.TellWaiting();
-            foreach (dynamic s in y.Result)
-            {
-                JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
-                {
-                    Result = s
-                };
-                Add(new TaskLite(a));
-            }
-            JRCtler.JsonRpcRes z = await Aria2Methords.TellStopped();
-            foreach (dynamic s in z.Result)
-            {
-                JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
-                {
-                    Result = s
-                };
-                string Status = a.Result.status;
-                if (Status!= "complete")
-                {
-                    Add(new TaskLite(a));
-                }
-                else
-                {
-                    TaskFinished?.Invoke(new TaskLite(a));
-                }
-            }
+            FinishedTaskList.Enqueue(e);
+            TaskFinished(e);
+        }
 
+        private void CheckRefreshResult(JRCtler.JsonRpcRes e)//检查Refresh方法中异步返回的结果
+        {
+            foreach (dynamic s in e.Result)
+            {
+                JRCtler.JsonRpcRes a = new JRCtler.JsonRpcRes
+                {
+                    Result = s
+                };
+                string g = a.Result.gid;
+                if (GidList.Contains(g)!=true)
+                {
+                    GidList.Add(g);
+                    string Status = a.Result.status;
+                    if (Status != "complete")
+                    {
+                        Add(new TaskLite(a));
+                    }
+                    else
+                    {
+                        TaskFinished?.Invoke(new TaskLite(a));
+                    }
+                }
+
+            }
+        }
+
+        private async void Refresh()//更新任务列表
+        {
+            JRCtler.JsonRpcRes x = await Aria2Methords.TellActive();
+            CheckRefreshResult(x);
+            JRCtler.JsonRpcRes y = await Aria2Methords.TellWaiting();
+            CheckRefreshResult(y);
+            JRCtler.JsonRpcRes z = await Aria2Methords.TellStopped();
+            CheckRefreshResult(z);
         }
 
         public async Task Update()//历遍单个任务，调用其刷新方法
         {
-            foreach (TaskLite s in this)
+            for (int i = 0; i < Count; i++)
             {
-                if (s.Status== "complete")
-                {
-                    Remove(s);
-                    break;
-                }
-                await s.Refresh();
+                this[i].TaskFinished += RemoveTask;
+                await this[i].Refresh();
+                this[i].TaskFinished -= RemoveTask;
+            }
+            while(FinishedTaskList.Count!=0)
+            {
+                Remove(FinishedTaskList.Dequeue());//直接在for或foreach循环中进行remove操作会导致异常
             }
             OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
+            Refresh();
+        }
+
+        public TaskList()
+        {
+            
         }
 
     }
 
     public class FinishedTask//已完成任务
     {
-        private async void GetInfo(string TaskGid)
-        {
-            string[] keys = new string[3];
-            keys[0] = "dir";
-            keys[1] = "totalLength";
-            keys[2] = "path";
-            var x = await Aria2Methords.TellStatus(TaskGid, keys);
-            Path = x.Result.path;
-            FileName = Path.Substring(Path.LastIndexOf(@"/"));
-            FileSize = x.Result.totalLength;
-            Icon = System.Drawing.Icon.ExtractAssociatedIcon(Path);
-        }
 
         public System.Drawing.Icon Icon { get; set; }//下载文件的图标
 
         public string FileName { get; set; }//下载的文件名
 
-        public string Gid { get; set; }//任务的GID
-
         public string Path { get; set; }//文件路径
 
         public string FileSize { get; set; }//文件尺寸
 
-        public FinishedTask(TaskLite e)
-        {
-            Gid = e.Gid;
-            GetInfo(Gid);
-        }
-        public FinishedTask(string Gid)
-        {
-            GetInfo(Gid);
-        }
+        public string FromGid { get; set; }//指示该下载文件来自哪个GID
+
 
     }
 
@@ -241,9 +237,14 @@ namespace ezAria2
     {
         private string Historys;
 
-        private void Save(Object Sender, EventArgs e)
+        private List<string> FinishedGidList = new List<string>();//该列表用于存储已经添加过的任务GID，避免重复添加
+
+        private void Save(Object Sender, EventArgs e)//读写代码有待优化
         {
-            File.WriteAllText(@"HistoryList.log", Historys);
+            lock (Historys)
+            {
+                File.WriteAllText(@"HistoryList.log", Historys);
+            }
         }
 
 
@@ -253,16 +254,33 @@ namespace ezAria2
             {
                 File.Create(@"HistoryList.log");
             }
-            Historys = File.ReadAllText(@"HistoryList.log");
+            lock(Historys)
+            {
+                Historys = File.ReadAllText(@"HistoryList.log");
+            }
         }
 
-        public void TaskCompleted(TaskLite e)
+        public async void TaskCompleted(TaskLite e)
         {
-            FinishedTask a = new FinishedTask(e);
-            if(!Contains(a))
+            if(FinishedGidList.Contains(e.Gid)==false)
             {
-                Add(a);
+                var y = await Aria2Methords.GetFiles(e.Gid);
+                Newtonsoft.Json.Linq.JArray results = y.Result;
+                foreach (dynamic x in results)
+                {
+                    FinishedTask a = new FinishedTask
+                    {
+                        Path = x.path,
+                        FileSize = x.length,
+                        FromGid = e.Gid
+                    };
+                    a.FileName = a.Path.Substring(a.Path.LastIndexOf(@"/")+1);
+                    a.Icon = System.Drawing.Icon.ExtractAssociatedIcon(a.Path);
+                    Add(a);
+                }
+                FinishedGidList.Add(e.Gid);
             }
+
         }
 
         public HistoryList()//任务列表的构造函数，实际使用时应当修改

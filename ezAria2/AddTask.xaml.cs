@@ -1,4 +1,5 @@
 ﻿using Arthas.Controls.Metro;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -36,6 +37,16 @@ namespace ezAria2
         private async void Add()
         {
             await Aria2Methords.AddUri(UriBox.Text);
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            IDataObject iData = Clipboard.GetDataObject();
+            if (iData.GetDataPresent(DataFormats.Text))
+            {
+                UriBox.Text = (string)iData.GetData(DataFormats.Text)+Environment.NewLine;
+                UriBox.Select(UriBox.Text.Length, 0);
+            }
         }
     }
 }

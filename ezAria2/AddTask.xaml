@@ -17,7 +17,13 @@
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="15"/>
         </Grid.ColumnDefinitions>
-        <Metro:MetroTextBox x:Name="UriBox" Text="请输入链接地址" Grid.Column="1" Grid.Row="1" CornerRadius="10" TextWrapping="Wrap" GotFocus="MetroTextBox_GotFocus" />
+        <Metro:MetroTextBox x:Name="UriBox" Text="请输入链接地址" Grid.Column="1" Grid.Row="1" CornerRadius="10" TextWrapping="Wrap" GotFocus="MetroTextBox_GotFocus">
+            <Metro:MetroTextBox.ContextMenu>
+                <ContextMenu Name="cm" StaysOpen="true">
+                    <MenuItem Header="粘贴" Click="MenuItem_Click"/>
+                </ContextMenu>
+            </Metro:MetroTextBox.ContextMenu>
+        </Metro:MetroTextBox>
         <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Metro:MetroButton Content="添加" Height="40" Width="100" Margin="40,0" Click="MetroButton_Click_Add" Background="#FF146099"/>
             <Metro:MetroButton Content="取消" Height="40" Width="100" Margin="40,0" Click="MetroButton_Click_Cancle" Background="#FF146099"/>

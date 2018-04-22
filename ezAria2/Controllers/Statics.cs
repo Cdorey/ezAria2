@@ -38,7 +38,10 @@ namespace ezAria2
             {
                 Directory.CreateDirectory(Start.Configs.dir);
             }
-
+            if (!File.Exists(@"HistoryList.log"))
+            {
+                File.Create(@"HistoryList.log");
+            }
             Start.Make();
             Aria2Process = new Process();
             Aria2Process.StartInfo.FileName = @"aria2c.exe";
@@ -47,7 +50,6 @@ namespace ezAria2
             Aria2Process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             Aria2Process.Start();
             Stc.GloConf = Start.Configs;//给全局配置变量赋值，同时初始化所有其他全局变量
-
             Line = new JRCtler(string.Format("ws://127.0.0.1:{0}/jsonrpc", GloConf.rpc_listen_port));//这里的逻辑重新梳理后，可以允许ezAria2作为客户端，控制其他主机的下载服务
             ProCtl = new ProgressController();
             Application.Current.Exit += new ExitEventHandler(Quit);

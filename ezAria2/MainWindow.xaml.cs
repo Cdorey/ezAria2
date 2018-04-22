@@ -17,6 +17,7 @@ namespace ezAria2
         public MainWindow()
         {
             InitializeComponent();
+            Stc.HistoryData.Load();
             Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
             Stc.TaskData.TaskFinished += Stc.HistoryData.TaskCompleted;
             //Binding TaskDataBinding = new Binding();
@@ -53,12 +54,12 @@ namespace ezAria2
             taskManager.Show();
         }
 
-        private void MetroBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MetroBorder_MouseLeftButtonUp(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        private void MetroBorder_MouseLeftButtonUp_NewTask(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MetroBorder_MouseLeftButtonUp_NewTask(object sender, RoutedEventArgs e)
         {
             AddTask Task = new AddTask();
             Task.Show();
@@ -72,7 +73,7 @@ namespace ezAria2
         {
         }
 
-        private void MetroBorder_MouseLeftButtonUp_StateChange(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MetroBorder_MouseLeftButtonUp_StateChange(object sender, RoutedEventArgs e)
         {
             if(TasksInProgress.SelectedItem!=null)
             {

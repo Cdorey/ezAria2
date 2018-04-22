@@ -36,6 +36,8 @@ namespace ezAria2
 
         public string Total { get; set; }//任务的尺寸
 
+        //public RoutedCommand Start=new RoutedCommand()
+
         public async void GetFileInfo()//获得文件信息
         {
             JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
@@ -235,28 +237,46 @@ namespace ezAria2
 
     public class HistoryList : ObservableCollection<FinishedTask>//历史任务列表
     {
-        private string Historys;
+        private int KickCount = 0;
+
+        private static readonly string HistorayListIsSaving = "HistorayListIsSaving";
 
         private List<string> FinishedGidList = new List<string>();//该列表用于存储已经添加过的任务GID，避免重复添加
 
         private void Save(Object Sender, EventArgs e)//读写代码有待优化
         {
-            lock (Historys)
+            if(KickCount<=60)
             {
-                File.WriteAllText(@"HistoryList.log", Historys);
+                KickCount++;
+            }
+            else
+            {
+                lock (HistorayListIsSaving)
+                {
+                    IList<FinishedTask> Historys = Items;
+                    File.WriteAllText(@"HistoryList.log", JsonConvert.SerializeObject(Historys));
+                }
             }
         }
 
 
-        private void Load()
+        public void Load()
         {
-            if (!File.Exists(@"HistoryList.log"))
+            Clear();
+            List<FinishedTask> Historys=null;
+            try
             {
-                File.Create(@"HistoryList.log");
+                Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));
+                if(Historys!=null)
+                {
+                    foreach (FinishedTask a in Historys)
+                    {
+                        Add(a);
+                    }
+                }
             }
-            lock(Historys)
+            catch (IOException)
             {
-                Historys = File.ReadAllText(@"HistoryList.log");
             }
         }
 
@@ -287,6 +307,7 @@ namespace ezAria2
         {
             //Load();
             //CollectionChanged += Save;
+            Stc.dispatcherTimer.Tick += new EventHandler(Save);
         }
     }
 

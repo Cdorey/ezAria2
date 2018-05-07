@@ -28,11 +28,11 @@ namespace ezAria2
             //判断几个关键的文件和路径是否存在
             if (!File.Exists(Start.Configs.save_session))
             {
-                File.Create(Start.Configs.save_session);
+                File.Create(Start.Configs.save_session).Close();
             }
             if (!File.Exists(Start.Configs.input_file))
             {
-                File.Create(Start.Configs.input_file);
+                File.Create(Start.Configs.input_file).Close();
             }
             if (!Directory.Exists(Start.Configs.dir))
             {
@@ -40,7 +40,7 @@ namespace ezAria2
             }
             if (!File.Exists(@"HistoryList.log"))
             {
-                File.Create(@"HistoryList.log");
+                File.Create(@"HistoryList.log").Close();
             }
             Start.Make();
             Aria2Process = new Process();

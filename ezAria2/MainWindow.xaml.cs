@@ -17,7 +17,6 @@ namespace ezAria2
         public MainWindow()
         {
             InitializeComponent();
-            Stc.HistoryData.Load();
             Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
             Stc.TaskData.TaskFinished += Stc.HistoryData.TaskCompleted;
             //Binding TaskDataBinding = new Binding();

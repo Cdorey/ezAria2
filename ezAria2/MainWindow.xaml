@@ -144,6 +144,19 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <DataTemplate x:Key="TaskIcon">
+            <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="60" ImageWidth="60" Grid.Column="0"/>
+        </DataTemplate>
+        <DataTemplate x:Key="TaskFileName">
+            <Grid>
+                <Metro:MetroProgressBar Value="{Binding Progress}" ProgressBarState="{Binding State}" ProgressBarHeight="40" VerticalAlignment="Center" Opacity="0.3" CornerRadius="0"/>
+                <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="18" Foreground="#FF667991" VerticalAlignment="Center" Margin="10"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="TaskSpeed">
+            <Metro:MetroTextBlock Text="{Binding Speed}" FontSize="18" Foreground="#FF667991" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Left" FontStyle="Italic" Margin="10"/>
+        </DataTemplate>
+
     </Window.Resources>
     <Grid>
         <Metro:MetroMenuTabControl Margin="0" FontSize="18" IsHitTestVisible="True" IconMode="True">
@@ -157,27 +170,34 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Metro:MetroGroupBox Header="正在进行中的任务" Margin="0,10" FontSize="12">
-                        <ListView x:Name="TasksInProgress" HorizontalContentAlignment="Stretch"  Margin="0,0,0,10">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="60"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="60"/>
-                                            <ColumnDefinition Width="7*"/>
-                                            <ColumnDefinition Width="3*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="60" ImageWidth="60" Grid.Column="0"/>
-                                        <Metro:MetroProgressBar Value="{Binding Progress}" ProgressBarState="{Binding State}" ProgressBarHeight="40" VerticalAlignment="Center" Grid.Column="1" Grid.ColumnSpan="3" Opacity="0.3" CornerRadius="0"/>
-                                        <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="24" Foreground="#FF667991" VerticalAlignment="Center" Grid.Column="1" Margin="10"/>
-                                        <Metro:MetroTextBlock Text="{Binding Speed}" FontSize="18" Foreground="#FF667991" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Left" FontStyle="Italic" Margin="10"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
+                        <ListView x:Name="TasksInProgress" HorizontalContentAlignment="Stretch"  Margin="0,0,0,10" >
+                            <ListView.ContextMenu>
+                                <Metro:MetroContextMenu Name="cm" StaysOpen="true">
+                                    <MenuItem Header="粘贴" Foreground="White"/>
+                                    <MenuItem Header="粘贴" Foreground="White"/>
+                                    <MenuItem Header="粘贴" Foreground="White"/>
+                                    <MenuItem Header="粘贴" Foreground="White"/>
+                                </Metro:MetroContextMenu>
+                            </ListView.ContextMenu>
+                            <ListView.View>
+                                <!--设置列标签并将列成员与一个变量名称相绑定，以便后台链接修改-->
+                                <GridView>
+                                    <GridViewColumn Header="下载状态" Width="60" CellTemplate="{StaticResource TaskIcon}"/>
+                                    <!--<GridViewColumn Header="进度" Width="100" DisplayMemberBinding="{Binding Path=WorkPhoneNumber}"/>-->
+                                    <GridViewColumn Header="当前速度" Width="60" CellTemplate="{StaticResource TaskSpeed}"/>
+                                    <GridViewColumn Header="文件名称" Width="{Binding ElementName=WidthHelper, Path=ActualWidth}" CellTemplate="{StaticResource TaskFileName}"/>
+                                </GridView>
+                            </ListView.View>
                         </ListView>
                     </Metro:MetroGroupBox>
+                    <Grid Visibility="Hidden">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="2" x:Name="WidthHelper"/>
+                    </Grid>
                     <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" >
                         <Button Width="70" Height="70" Margin="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click" ToolTip="新建任务">
                             <Metro:MetroImage Source="Resources/play-1073616_640.png"  />

@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
+using Arthas.Controls.Metro;
 
 namespace ezAria2
 {
@@ -9,6 +10,9 @@ namespace ezAria2
         private NotifyIcon NotifyIcon;
         private void InitialTray()
         {
+            MenuItem menuItem = new MenuItem("粘贴");
+            ContextMenu metroContextMenu = new ContextMenu();
+            metroContextMenu.MenuItems.Add(menuItem);
             //设置托盘的各个属性
             NotifyIcon = new NotifyIcon
             {
@@ -20,6 +24,7 @@ namespace ezAria2
             };
             NotifyIcon.ShowBalloonTip(500);//托盘气泡显示时间
             NotifyIcon.MouseDoubleClick += NotifyIcon_MouseDoubleClick;
+            NotifyIcon.ContextMenu = metroContextMenu;
         }
 
         private void NotifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)

@@ -146,6 +146,8 @@ namespace ezAria2
 
     public class TaskList : ObservableCollection<TaskLite>//任务列表
     {
+        private readonly string IsUpdating = "IsUpdating";
+
         public delegate void TaskFinish(TaskLite e);
 
         public event TaskFinish TaskFinished;//有任务状态为completed时触发
@@ -255,29 +257,40 @@ namespace ezAria2
                 {
                     IList<FinishedTask> Historys = Items;
                     File.WriteAllText(@"HistoryList.log", JsonConvert.SerializeObject(Historys));
+                    KickCount = 0;
                 }
             }
         }
 
 
-        public void Load()
+        private void Load()
         {
             Clear();
             List<FinishedTask> Historys=null;
-            try
+            Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));
+            if (Historys != null)
             {
-                Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));
-                if(Historys!=null)
+                foreach (FinishedTask a in Historys)
                 {
-                    foreach (FinishedTask a in Historys)
-                    {
-                        Add(a);
-                    }
+                    Add(a);
                 }
             }
-            catch (IOException)
-            {
-            }
+            //try
+            //{
+            //    Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));
+            //    if(Historys!=null)
+            //    {
+            //        foreach (FinishedTask a in Historys)
+            //        {
+            //            Add(a);
+            //        }
+            //    }
+            //}
+            //catch (IOException)
+            //{
+            //    Thread.Sleep(15);
+            //    Load();
+            //}
         }
 
         public async void TaskCompleted(TaskLite e)
@@ -305,7 +318,7 @@ namespace ezAria2
 
         public HistoryList()//任务列表的构造函数，实际使用时应当修改
         {
-            //Load();
+            Load();
             //CollectionChanged += Save;
             Stc.dispatcherTimer.Tick += new EventHandler(Save);
         }

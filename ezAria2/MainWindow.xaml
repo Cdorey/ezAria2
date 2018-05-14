@@ -22,6 +22,7 @@
     </Metro:MetroWindow.ContextMenu>-->
     <Window.Resources>
         <Style TargetType="Button">
+            <!--圆按钮-->
             <!--按钮字体颜色-->
             <Setter Property="Foreground" Value="Black"/>
             <!--修改模板属性-->
@@ -145,12 +146,12 @@
             </Setter>
         </Style>
         <DataTemplate x:Key="TaskIcon">
-            <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="60" ImageWidth="60" Grid.Column="0"/>
+            <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
         </DataTemplate>
         <DataTemplate x:Key="TaskFileName">
             <Grid>
                 <Metro:MetroProgressBar Value="{Binding Progress}" ProgressBarState="{Binding State}" ProgressBarHeight="40" VerticalAlignment="Center" Opacity="0.3" CornerRadius="0"/>
-                <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="18" Foreground="#FF667991" VerticalAlignment="Center" Margin="10"/>
+                <Metro:MetroTextBlock Margin="10"  Text="{Binding FileName}" FontSize="18" VerticalAlignment="Center" Width="{Binding ElementName=WidthHelper, Path=ActualWidth}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="TaskSpeed">
@@ -182,9 +183,9 @@
                             <ListView.View>
                                 <!--设置列标签并将列成员与一个变量名称相绑定，以便后台链接修改-->
                                 <GridView>
-                                    <GridViewColumn Header="下载状态" Width="60" CellTemplate="{StaticResource TaskIcon}"/>
+                                    <GridViewColumn Header="类型" Width="40" CellTemplate="{StaticResource TaskIcon}"/>
                                     <!--<GridViewColumn Header="进度" Width="100" DisplayMemberBinding="{Binding Path=WorkPhoneNumber}"/>-->
-                                    <GridViewColumn Header="当前速度" Width="60" CellTemplate="{StaticResource TaskSpeed}"/>
+                                    <GridViewColumn Header="当前速度" Width="100" CellTemplate="{StaticResource TaskSpeed}"/>
                                     <GridViewColumn Header="文件名称" Width="{Binding ElementName=WidthHelper, Path=ActualWidth}" CellTemplate="{StaticResource TaskFileName}"/>
                                 </GridView>
                             </ListView.View>
@@ -263,7 +264,6 @@
                     </StackPanel>
                 </Metro:MetroGroupBox>
             </Metro:MetroMenuTabItem>
-
         </Metro:MetroMenuTabControl>
     </Grid>
 </Metro:MetroWindow>

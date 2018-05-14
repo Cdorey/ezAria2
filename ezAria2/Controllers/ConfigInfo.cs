@@ -50,9 +50,11 @@ namespace ezAria2
         public string bt_save_metadata { get; set; }
 
     }
+
     public class ConfigController //配置文件控制器
     {
         public ConfigInformation Configs = new ConfigInformation();
+
         public void LoadConfigFile()
         {
             using (StreamReader sr = new StreamReader(@"json.conf"))
@@ -76,6 +78,7 @@ namespace ezAria2
                 }
             }
         }
+
         public void Make()//根据当前内存中的Key和Value生成一份aria2.conf文件
         {
             string ConfigFileBody = "";
@@ -88,11 +91,13 @@ namespace ezAria2
             File.WriteAllText(@"aria2.conf", ConfigFileBody, Encoding.Default); //将ConfigFileBody的内容写入aria2.conf
             SavingConfigFile();
         }
+
         public void SavingConfigFile() //写配置文件，将全部配置文件保存到json
         {
             string output = JsonConvert.SerializeObject(Configs);
             File.WriteAllText(@"json.conf", output, Encoding.UTF8); //将output的内容写入json.conf
         }
+
         public ConfigController() //构造函数
         {
             LoadConfigFile();
@@ -100,6 +105,24 @@ namespace ezAria2
 
         ~ConfigController() //析构函数
         {
+        }
+    }
+
+    public class ApplicationConfig //应用程序自身的配置文件
+    {
+        public string Aria2cPath;
+
+        public string Aria2cConfigPath;
+
+        public string ApplicationConfigPath;
+
+        public string Aria2cConfigJson;
+
+        public ApplicationConfig()
+        {
+            Aria2cPath = @"aria2c.exe";
+            Aria2cConfigPath = @"aria2.conf";
+            ApplicationConfigPath = @"Config.xml";
         }
     }
 }

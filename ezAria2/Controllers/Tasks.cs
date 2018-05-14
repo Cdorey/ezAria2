@@ -14,6 +14,8 @@ namespace ezAria2
 {
     public class TaskLite//小型任务对象,用于任务列表
     {
+        private int OughtToRefresh = 3;//归零时刷新
+
         public delegate void TaskFinish(TaskLite e);
 
         public event TaskFinish TaskFinished;//当前任务的status变成completed时触发
@@ -41,28 +43,49 @@ namespace ezAria2
         public async void GetFileInfo()//获得文件信息
         {
             JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
-            string uri = x.Result[0].uris[0].uri;
-            FileName=uri.Substring(uri.LastIndexOf(@"/")+1);
-            //if (x.Result.GetLength(0) != 1)
-            //{
-            //    FileName = FileName + "等";
-            //}
+            if (x.Result.Count == 1)
+            {
+                string uri = x.Result[0].uris[0].uri;
+                if (uri != null)
+                {
+                    FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
+                }
+                else
+                {
+                    string path = x.Result[0].path;
+                    FileName = path.Substring(path.LastIndexOf(@"/") + 1);
+                }
+            }
+            else
+            {
+                string path = x.Result[0].path;
+                int count = x.Result.Count;
+                FileName = path.Substring(path.IndexOf(@"/") + 1, path.LastIndexOf(@"/")) + "，共计" + count.ToString() + "个文件";
+            }
         }
 
         public async Task Refresh()//刷新任务状态
         {
-            JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
-            InformationRefresh(e);
+            if(OughtToRefresh<=0)
+            {
+                JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
+                InformationRefresh(e);
+            }
+            else
+            {
+                OughtToRefresh --;
+            }
         }
 
         public void StateChangeFunction()
         {
             StateChange();
+            OughtToRefresh = 0;
         }
 
         private async void StateChange()
         {
-            if(State=="none")
+            if (State == "none")
             {
                 await Aria2Methords.Pause(Gid);
                 State = "error";
@@ -102,27 +125,33 @@ namespace ezAria2
                 case "waiting":
                     State = "wait";
                     Icon = "Resources/stopwatch-1849088_640.png";
+                    OughtToRefresh = 5;
                     break;
                 case "paused":
-                    State = "error";
+                    State = "wait";
                     Icon = "Resources/cup-1849083_640.png";
+                    OughtToRefresh = 5;
                     break;
                 case "error":
                     State = "error";
                     Icon = "Resources/cup-1849083_640.png";
+                    OughtToRefresh = 10;
                     break;
                 case "complete":
                     State = "none";
                     Icon = "Resources/stopwatch-1849088_640.png";
                     TaskFinished?.Invoke(this);
+                    OughtToRefresh = 10;
                     break;
                 case "removed":
                     State = "error";
                     Icon = "Resources/cup-1849083_640.png";
+                    OughtToRefresh = 10;
                     break;
                 default:
                     State = "wait";
                     Icon = "Resources/cup-1849083_640.png";
+                    OughtToRefresh = 5;
                     break;
             }
             if (e.Result.totalLength == 0)
@@ -136,6 +165,7 @@ namespace ezAria2
             }
             Gid = e.Result.gid;
             GetFileInfo();
+            e = null;
         }
 
         public TaskLite(JRCtler.JsonRpcRes e)//构造函数
@@ -146,13 +176,11 @@ namespace ezAria2
 
     public class TaskList : ObservableCollection<TaskLite>//任务列表
     {
-        private readonly string IsUpdating = "IsUpdating";
-
         public delegate void TaskFinish(TaskLite e);
 
         public event TaskFinish TaskFinished;//有任务状态为completed时触发
 
-        private Queue<TaskLite> FinishedTaskList=new Queue<TaskLite>();//该队列内容为已完成待移除的任务
+        private Queue<TaskLite> FinishedTaskList = new Queue<TaskLite>();//该队列内容为已完成待移除的任务
 
         private List<string> GidList = new List<string>();//该列表用于存储已经添加过的任务GID，避免重复添加
 
@@ -171,7 +199,7 @@ namespace ezAria2
                     Result = s
                 };
                 string g = a.Result.gid;
-                if (GidList.Contains(g)!=true)
+                if (GidList.Contains(g) != true)
                 {
                     GidList.Add(g);
                     string Status = a.Result.status;
@@ -206,7 +234,7 @@ namespace ezAria2
                 await this[i].Refresh();
                 this[i].TaskFinished -= RemoveTask;
             }
-            while(FinishedTaskList.Count!=0)
+            while (FinishedTaskList.Count != 0)
             {
                 Remove(FinishedTaskList.Dequeue());//直接在for或foreach循环中进行remove操作会导致异常
             }
@@ -216,7 +244,7 @@ namespace ezAria2
 
         public TaskList()
         {
-            
+
         }
 
     }
@@ -247,7 +275,7 @@ namespace ezAria2
 
         private void Save(Object Sender, EventArgs e)//读写代码有待优化
         {
-            if(KickCount<=60)
+            if (KickCount <= 60)
             {
                 KickCount++;
             }
@@ -266,7 +294,7 @@ namespace ezAria2
         private void Load()
         {
             Clear();
-            List<FinishedTask> Historys=null;
+            List<FinishedTask> Historys = null;
             Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));
             if (Historys != null)
             {
@@ -295,7 +323,7 @@ namespace ezAria2
 
         public async void TaskCompleted(TaskLite e)
         {
-            if(FinishedGidList.Contains(e.Gid)==false)
+            if (FinishedGidList.Contains(e.Gid) == false)
             {
                 var y = await Aria2Methords.GetFiles(e.Gid);
                 Newtonsoft.Json.Linq.JArray results = y.Result;
@@ -307,7 +335,7 @@ namespace ezAria2
                         FileSize = x.length,
                         FromGid = e.Gid
                     };
-                    a.FileName = a.Path.Substring(a.Path.LastIndexOf(@"/")+1);
+                    a.FileName = a.Path.Substring(a.Path.LastIndexOf(@"/") + 1);
                     a.Icon = System.Drawing.Icon.ExtractAssociatedIcon(a.Path);
                     Add(a);
                 }
@@ -384,12 +412,6 @@ namespace ezAria2
         private void Send(JsonRpcReq SendMessage)//发消息
         {
             ws.Send(JsonConvert.SerializeObject(SendMessage));
-            //if (!File.Exists(@"log.txt"))
-            //{
-            //    File.CreateText(@"log.txt");
-            //}
-            //string Logs = File.ReadAllText(@"log.txt") +"send:"+ JsonConvert.SerializeObject(SendMessage) + Environment.NewLine;
-            //File.WriteAllText(@"log.txt", Logs);
         }
 
         private void JsonRpcMessage(string Message)//收消息
@@ -405,7 +427,7 @@ namespace ezAria2
             }
             if (!File.Exists(@"log.txt"))
             {
-                File.CreateText(@"log.txt");
+                File.CreateText(@"log.txt").Close();
             }
             string Logs = File.ReadAllText(@"log.txt") + "Message:" + Message + Environment.NewLine;
             File.WriteAllText(@"log.txt", Logs);
@@ -426,6 +448,20 @@ namespace ezAria2
             return RespondList[NewTask.Id];
         }
 
+        public JsonRpcRes JsonRpc(string methord, ArrayList Params)//同步开始一个远程调用
+        {
+            JsonRpcReq NewTask = new JsonRpcReq(methord, Idlist++, Params);
+            Send(NewTask);//这一行应该调用控制器的方法执行NewTask请求
+
+            while (!RespondList.ContainsKey(NewTask.Id))
+            {
+                Thread.Sleep(500);
+            }
+            var s = RespondList[NewTask.Id];
+            RespondList.Remove(NewTask.Id);
+            return s;
+        }
+
         //构造函数
         public JRCtler(string Uri)
         {
@@ -444,11 +480,16 @@ namespace ezAria2
 
     public static class Aria2Methords//Aria2 Rpc接口的方法库
     {
-        private static string Base64Encode(FileStream File)
+        private static string Base64Encode(string Path)
         {
-            byte[] bt = new byte[File.Length];
-            File.Read(bt, 0, bt.Length);
-            return Convert.ToBase64String(bt);
+            try
+            {
+                return Convert.ToBase64String(File.ReadAllBytes(Path));
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
         }
 
         public static async Task<string> AddUri(string Uri)
@@ -474,9 +515,9 @@ namespace ezAria2
             return Gid;
         }
 
-        public static async Task<string> AddTorrent(FileStream File)//添加种子
+        public static async Task<string> AddTorrent(string Path)//添加种子
         {
-            string TorrentBase64 = Base64Encode(File);
+            string TorrentBase64 = Base64Encode(Path);
             ArrayList Params = new ArrayList
             {
                 "token:" + Stc.GloConf.rpc_secret,
@@ -486,9 +527,9 @@ namespace ezAria2
             return Gid;
         }
 
-        public static async Task<string> AddMetalink(FileStream File)//添加MetaLink
+        public static async Task<string> AddMetalink(string Path)//添加MetaLink
         {
-            string MetalinkBase64 = Base64Encode(File);
+            string MetalinkBase64 = Base64Encode(Path);
             ArrayList Params = new ArrayList
             {
                 "token:" + Stc.GloConf.rpc_secret,
@@ -637,13 +678,13 @@ namespace ezAria2
 
         }
 
-        public static async void ShutDown()
+        public static void ShutDown()
         {
             ArrayList Params = new ArrayList
             {
-                "token" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.rpc_secret,
             };
-            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.shutdown", Params);
+            JRCtler.JsonRpcRes Result = Stc.Line.JsonRpc("aria2.shutdown", Params);
         }
 
     }

@@ -83,6 +83,11 @@ namespace ezAria2
             OughtToRefresh = 0;
         }
 
+        public async Task Remove()
+        {
+            await Aria2Methords.Remove(Gid);
+        }
+
         private async void StateChange()
         {
             if (State == "none")
@@ -434,7 +439,13 @@ namespace ezAria2
         }
 
         //公开方法
-        public async Task<JsonRpcRes> JsonRpcAsync(string methord, ArrayList Params)//异步开始一个远程调用
+        /// <summary>
+        /// 异步开始一个远程调用
+        /// </summary>
+        /// <param name="methord">方法</param>
+        /// <param name="Params">参数数组</param>
+        /// <returns></returns>
+        public async Task<JsonRpcRes> JsonRpcAsync(string methord, ArrayList Params)
         {
             JsonRpcReq NewTask = new JsonRpcReq(methord, Idlist++, Params);
             Send(NewTask);//这一行应该调用控制器的方法执行NewTask请求
@@ -448,7 +459,13 @@ namespace ezAria2
             return RespondList[NewTask.Id];
         }
 
-        public JsonRpcRes JsonRpc(string methord, ArrayList Params)//同步开始一个远程调用
+        /// <summary>
+        /// 同步开始一个远程调用
+        /// </summary>
+        /// <param name="methord">方法</param>
+        /// <param name="Params">参数数组</param>
+        /// <returns></returns>
+        public JsonRpcRes JsonRpc(string methord, ArrayList Params)
         {
             JsonRpcReq NewTask = new JsonRpcReq(methord, Idlist++, Params);
             Send(NewTask);//这一行应该调用控制器的方法执行NewTask请求
@@ -460,6 +477,11 @@ namespace ezAria2
             var s = RespondList[NewTask.Id];
             RespondList.Remove(NewTask.Id);
             return s;
+        }
+
+        public void Quit()
+        {
+            ws.Close();
         }
 
         //构造函数
@@ -476,9 +498,13 @@ namespace ezAria2
                 JsonRpcMessage(e.Data);
             };
         }
+
     }
 
-    public static class Aria2Methords//Aria2 Rpc接口的方法库
+    /// <summary>
+    /// Aria2 Rpc接口的方法库
+    /// </summary>
+    public static class Aria2Methords
     {
         private static string Base64Encode(string Path)
         {
@@ -492,6 +518,11 @@ namespace ezAria2
             }
         }
 
+        /// <summary>
+        /// 新建一个任务
+        /// </summary>
+        /// <param name="Uri">下载链接的地址</param>
+        /// <returns></returns>
         public static async Task<string> AddUri(string Uri)
         {
             string[] Uris = new string[] { Uri };
@@ -504,6 +535,11 @@ namespace ezAria2
             return Gid;
         }
 
+        /// <summary>
+        /// 新建一个任务，包含多个源
+        /// </summary>
+        /// <param name="Uris">这个包含多个下载链接的数组指向同一个文件</param>
+        /// <returns></returns>
         public static async Task<string> AddUri(string[] Uris)
         {
             ArrayList Params = new ArrayList
@@ -515,7 +551,12 @@ namespace ezAria2
             return Gid;
         }
 
-        public static async Task<string> AddTorrent(string Path)//添加种子
+        /// <summary>
+        /// 添加种子
+        /// </summary>
+        /// <param name="Path">种子文件在计算机上的位置</param>
+        /// <returns></returns>
+        public static async Task<string> AddTorrent(string Path)
         {
             string TorrentBase64 = Base64Encode(Path);
             ArrayList Params = new ArrayList
@@ -527,7 +568,12 @@ namespace ezAria2
             return Gid;
         }
 
-        public static async Task<string> AddMetalink(string Path)//添加MetaLink
+        /// <summary>
+        /// 添加MetaLink
+        /// </summary>
+        /// <param name="Path">MetaLink文件在计算机上的位置</param>
+        /// <returns></returns>
+        public static async Task<string> AddMetalink(string Path)
         {
             string MetalinkBase64 = Base64Encode(Path);
             ArrayList Params = new ArrayList
@@ -678,6 +724,9 @@ namespace ezAria2
 
         }
 
+        /// <summary>
+        /// 关闭Aria2C，调用Aria2自己的方法
+        /// </summary>
         public static void ShutDown()
         {
             ArrayList Params = new ArrayList

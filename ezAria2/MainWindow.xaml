@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:ezAria2"
         xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas"
         mc:Ignorable="d"
-        Title="ezAria2" Height="600" Width="800" MinWidth="800" MinHeight="600" BorderBrush="#FF146099" Icon="Resources/forward-2831368_640.png" Activated="MetroWindow_Activated">
+        Title="ezAria2" Height="600" Width="800" MinWidth="800" MinHeight="600" BorderBrush="#FF146099" Icon="Resources/Umbrella.png" Activated="MetroWindow_Activated">
     <Metro:MetroWindow.Menu>
         <Metro:MetroTitleMenu>
-            <Metro:MetroTitleMenuItem Header="测试" Click="MetroTitleMenuItem_Click"/>
+            <Metro:MetroTitleMenuItem Header="退出" Click="MetroTitleMenuItem_Click"/>
             <Metro:MetroTitleMenuItem Header="测试" IsEnabled="False" />
             <Metro:MetroTitleMenuItem Name="SettingButtom" Header="设置" Click="SettingButton_Click"/>
             <Metro:MetroTitleMenuItem Header="关于"/>
@@ -201,16 +201,16 @@
                     </Grid>
                     <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" >
                         <Button Width="70" Height="70" Margin="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click" ToolTip="新建任务">
-                            <Metro:MetroImage Source="Resources/play-1073616_640.png"  />
+                            <Metro:MetroImage Source="Resources/Icon40/New Copy.png"  />
                         </Button>
                         <Button Width="70" Height="70" Margin="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Click="MetroBorder_MouseLeftButtonUp_StateChange" ToolTip="暂停任务" >
-                            <Metro:MetroImage Source="Resources/cloud-2044820_640.png"  />
+                            <Metro:MetroImage Source="Resources/Icon40/Start.png"  />
                         </Button>
                         <Button Width="70" Height="70" Margin="20,0" ToolTip="这个按钮啥用也没有" Foreground="Red" >
-                            <Metro:MetroImage Source="Resources/flag-1095057_640.png"  />
+                            <Metro:MetroImage Source="Resources/Icon40/Web.png"  />
                         </Button>
-                        <Button Width="70" Height="70" Margin="20,0" Background="{x:Null}" Click="MetroBorder_MouseLeftButtonUp" ToolTip="关闭主窗口" >
-                            <Metro:MetroImage Source="Resources/close-1540630_640.png"  />
+                        <Button Width="70" Height="70" Margin="20,0" Background="{x:Null}" Click="MetroBorder_MouseLeftButtonUp" ToolTip="取消任务" >
+                            <Metro:MetroImage Source="Resources/Icon40/Cancel_1.png"  />
                         </Button>
                     </StackPanel>
                 </Grid>

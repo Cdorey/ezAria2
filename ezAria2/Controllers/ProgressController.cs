@@ -8,7 +8,6 @@ namespace ezAria2
 {
     public class ProgressController//这个类控制托盘按钮
     {
-        private Window Window;
         private NotifyIcon NotifyIcon;
         private void InitialTray()
         {
@@ -29,8 +28,17 @@ namespace ezAria2
             NotifyIcon.ShowBalloonTip(500);//托盘气泡显示时间
             NotifyIcon.MouseDoubleClick += NotifyIcon_MouseDoubleClick;
             NotifyIcon.ContextMenu = ContextMenu;
-            Window = new Window();
-            Window.Hide();
+            NotifyIcon.DoubleClick += new EventHandler(ShowMainWindow);
+        }
+
+        private void ShowMainWindow(object sender, EventArgs e)
+        {
+            var MainWindow = System.Windows.Application.Current.MainWindow;
+            if (MainWindow==null)
+            {
+                MainWindow = new MainWindow();
+                MainWindow.Show();
+            }
         }
 
         private void Quit(object sender, EventArgs e)

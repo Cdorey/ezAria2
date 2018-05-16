@@ -7,7 +7,10 @@ using System.Windows.Threading;
 
 namespace ezAria2
 {
-    public class Stc//保存所有的全局资源
+    /// <summary>
+    /// 保存所有的全局资源
+    /// </summary>
+    public class Stc
     {
         private static Process Aria2Process;//aria2c的进程
 
@@ -19,14 +22,14 @@ namespace ezAria2
         public static HistoryList HistoryData;
         public static ApplicationConfig Config=new ApplicationConfig();
 
-        public static void Quit(object sender, ExitEventArgs e)//程序关闭事件
+        private static void Quit(object sender, ExitEventArgs e)//程序关闭事件
         {
-            Aria2Methords.ShutDown();
-            //Aria2Process.Kill();
+            Line.Quit();
             ProCtl.Dispose();
+            Aria2Methords.ShutDown();
         }
 
-        public static void Crash(object sender, DispatcherUnhandledExceptionEventArgs e)//程序崩溃事件
+        private static void Crash(object sender, DispatcherUnhandledExceptionEventArgs e)//程序崩溃事件
         {
             Aria2Process.Kill();
             ProCtl.Dispose();
@@ -62,17 +65,13 @@ namespace ezAria2
             Stc.GloConf = Start.Configs;//给全局配置变量赋值，同时初始化所有其他全局变量
             Line = new JRCtler(string.Format("ws://127.0.0.1:{0}/jsonrpc", GloConf.rpc_listen_port));//这里的逻辑重新梳理后，可以允许ezAria2作为客户端，控制其他主机的下载服务
             ProCtl = new ProgressController();
+            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             Application.Current.Exit += new ExitEventHandler(Quit);
             Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(Crash);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
             TaskData = new TaskList();
             HistoryData = new HistoryList();
-        }
-
-        ~Stc()
-        {
-            Aria2Process.Kill();
         }
     }
 

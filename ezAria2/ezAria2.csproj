@@ -171,6 +171,25 @@
     <Content Include="aria2c.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\icon40\bt.png" />
+    <Resource Include="Resources\icon40\cancel.png" />
+    <Resource Include="Resources\icon40\cancel_1.png" />
+    <Resource Include="Resources\icon40\Download.png" />
+    <Resource Include="Resources\icon40\link.png" />
+    <Resource Include="Resources\icon40\New Copy.png" />
+    <Resource Include="Resources\icon40\start.png" />
+    <Resource Include="Resources\icon40\web.png" />
+    <Resource Include="Resources\icon40\空投.png" />
+    <Resource Include="Resources\icon70\bt.png" />
+    <Resource Include="Resources\icon70\cancel.png" />
+    <Resource Include="Resources\icon70\cancel_1.png" />
+    <Resource Include="Resources\icon70\Download.png" />
+    <Resource Include="Resources\icon70\link.png" />
+    <Resource Include="Resources\icon70\New Copy.png" />
+    <Resource Include="Resources\icon70\start.png" />
+    <Resource Include="Resources\icon70\web.png" />
+    <Resource Include="Resources\icon70\空投.png" />
+    <Resource Include="Resources\Umbrella.png" />
     <Resource Include="MainIcon.ico" />
     <Resource Include="Resources\forward-2831368_640.png" />
     <Resource Include="Resources\bonfire-1849089_640.png" />

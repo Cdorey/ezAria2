@@ -49,13 +49,15 @@ namespace ezAria2
 
         private void MetroTitleMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            TaskManager taskManager = new TaskManager();
-            taskManager.Show();
+            Application.Current.Shutdown();
         }
 
-        private void MetroBorder_MouseLeftButtonUp(object sender, RoutedEventArgs e)
+        private async void MetroBorder_MouseLeftButtonUp(object sender, RoutedEventArgs e)
         {
-            Close();
+            if (TasksInProgress.SelectedItem != null)
+            {
+                await ((TaskLite)TasksInProgress.SelectedItem).Remove();
+            }
         }
 
         private void MetroBorder_MouseLeftButtonUp_NewTask(object sender, RoutedEventArgs e)

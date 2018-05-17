@@ -4,10 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using WebSocketSharp;
 
 namespace ezAria2
@@ -357,7 +355,10 @@ namespace ezAria2
         }
     }
 
-    public class JRCtler//JsonRpc控制器，基于WebSocket
+    /// <summary>
+    /// JsonRpc控制器，基于WebSocket
+    /// </summary>
+    public class JRCtler
     {
         private class JsonRpcReq//一个请求消息对象
         {
@@ -737,5 +738,4 @@ namespace ezAria2
         }
 
     }
-
 }

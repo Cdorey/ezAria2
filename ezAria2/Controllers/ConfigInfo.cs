@@ -5,7 +5,10 @@ using System.Text;
 
 namespace ezAria2
 {
-    public class ConfigInformation //配置文件对象
+    /// <summary>
+    /// 一份配置文件，实例化得到的是已保存内容，可能和当前Aria2C进程拥有的配置文件不同
+    /// </summary>
+    public class ConfigInformation 
     {
         public string dir { get; set; }
         public string disk_cache { get; set; }
@@ -55,14 +58,13 @@ namespace ezAria2
     {
         public ConfigInformation Configs = new ConfigInformation();
 
-        public void LoadConfigFile()
+        /// <summary>
+        /// 序列化配置文件为ConfigInformation对象
+        /// </summary>
+        /// <param name="Json_config">Json形式的Config配置文件</param>
+        private void LoadConfigFile(string Json_config)
         {
-            using (StreamReader sr = new StreamReader(@"json.conf"))
-            {
-                // Read the stream to a string, and write the string to the console.
-                String Json_config = sr.ReadToEnd();
-                Configs = JsonConvert.DeserializeObject<ConfigInformation>(Json_config);
-            }
+            Configs = JsonConvert.DeserializeObject<ConfigInformation>(Json_config);
             if (Configs.rpc_secret.Length != 16)
             {
                 Random creator = new Random();
@@ -79,20 +81,25 @@ namespace ezAria2
             }
         }
 
-        public void Make()//根据当前内存中的Key和Value生成一份aria2.conf文件
+        /// <summary>
+        /// 根据当前实例的Configs属性中的Key和Value生成一份aria2.conf文件
+        /// </summary>
+        public void Make()
         {
             string ConfigFileBody = "";
             foreach (System.Reflection.PropertyInfo p in Configs.GetType().GetProperties())
             {
                 string info = string.Format("{0} = {1}", p.Name.Replace("_", "-"), p.GetValue(Configs));
                 ConfigFileBody = ConfigFileBody + info + Environment.NewLine;
-
             }
-            File.WriteAllText(@"aria2.conf", ConfigFileBody, Encoding.Default); //将ConfigFileBody的内容写入aria2.conf
+            File.WriteAllText(Stc.Config.Aria2cConfigPath, ConfigFileBody, Encoding.Default); //将ConfigFileBody的内容写入aria2.conf
             SavingConfigFile();
         }
 
-        public void SavingConfigFile() //写配置文件，将全部配置文件保存到json
+        /// <summary>
+        /// 写配置文件，将全部配置文件保存到json
+        /// </summary>
+        public void SavingConfigFile()
         {
             string output = JsonConvert.SerializeObject(Configs);
             File.WriteAllText(@"json.conf", output, Encoding.UTF8); //将output的内容写入json.conf
@@ -100,11 +107,10 @@ namespace ezAria2
 
         public ConfigController() //构造函数
         {
-            LoadConfigFile();
-        }
-
-        ~ConfigController() //析构函数
-        {
+            using (StreamReader sr = new StreamReader(@"json.conf"))
+            {
+                LoadConfigFile(sr.ReadToEnd());
+            }
         }
     }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -10,21 +9,41 @@ namespace ezAria2
     /// <summary>
     /// 保存所有的全局资源
     /// </summary>
-    public class Stc
+    public static class Stc
     {
         private static Process Aria2Process;//aria2c的进程
 
+        /// <summary>
+        /// 与Aria2C进程的连接，协议是WebSocket
+        /// </summary>
         public static JRCtler Line;
+        /// <summary>
+        /// Make给aria2c.exe的配置文件
+        /// </summary>
         public static ConfigInformation GloConf;
-        public static ProgressController ProCtl;//托盘
+        /// <summary>
+        /// 系统托盘的图标
+        /// </summary>
+        public static ProgressController ProCtl;
+        /// <summary>
+        /// 一个Timer，每秒触发一次
+        /// </summary>
         public static DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        /// <summary>
+        /// 正在进行的任务列表
+        /// </summary>
         public static TaskList TaskData;
+        /// <summary>
+        /// 已完成任务列表
+        /// </summary>
         public static HistoryList HistoryData;
+        /// <summary>
+        /// ezAria2 GUI的配置文件
+        /// </summary>
         public static ApplicationConfig Config=new ApplicationConfig();
 
         private static void Quit(object sender, ExitEventArgs e)//程序关闭事件
         {
-            Line.Quit();
             ProCtl.Dispose();
             Aria2Methords.ShutDown();
         }

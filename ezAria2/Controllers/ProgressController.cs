@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Drawing;
-using System.Windows;
 using System.Windows.Forms;
-using Arthas.Controls.Metro;
 
 namespace ezAria2
 {
@@ -38,6 +36,10 @@ namespace ezAria2
             {
                 MainWindow = new MainWindow();
                 MainWindow.Show();
+            }
+            else
+            {
+                //如果MainWindow存在，则将其置顶
             }
         }
 

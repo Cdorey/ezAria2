@@ -10,7 +10,7 @@
     <Metro:MetroWindow.Menu>
         <Metro:MetroTitleMenu>
             <Metro:MetroTitleMenuItem Header="退出" Click="MetroTitleMenuItem_Click"/>
-            <Metro:MetroTitleMenuItem Header="测试" IsEnabled="False" />
+            <Metro:MetroTitleMenuItem Header="测试"/>
             <Metro:MetroTitleMenuItem Name="SettingButtom" Header="设置" Click="SettingButton_Click"/>
             <Metro:MetroTitleMenuItem Header="关于"/>
         </Metro:MetroTitleMenu>
@@ -157,7 +157,6 @@
         <DataTemplate x:Key="TaskSpeed">
             <Metro:MetroTextBlock Text="{Binding Speed}" FontSize="18" Foreground="#FF667991" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Left" FontStyle="Italic" Margin="10"/>
         </DataTemplate>
-
     </Window.Resources>
     <Grid>
         <Metro:MetroMenuTabControl Margin="0" FontSize="18" IsHitTestVisible="True" IconMode="True">
@@ -206,9 +205,9 @@
                         <Button Width="70" Height="70" Margin="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Click="MetroBorder_MouseLeftButtonUp_StateChange" ToolTip="暂停任务" >
                             <Metro:MetroImage Source="Resources/Icon40/Start.png"  />
                         </Button>
-                        <Button Width="70" Height="70" Margin="20,0" ToolTip="这个按钮啥用也没有" Foreground="Red" >
+                        <!--<Button Width="70" Height="70" Margin="20,0" ToolTip="这个按钮啥用也没有" Foreground="Red" >
                             <Metro:MetroImage Source="Resources/Icon40/Web.png"  />
-                        </Button>
+                        </Button>-->
                         <Button Width="70" Height="70" Margin="20,0" Background="{x:Null}" Click="MetroBorder_MouseLeftButtonUp" ToolTip="取消任务" >
                             <Metro:MetroImage Source="Resources/Icon40/Cancel_1.png"  />
                         </Button>

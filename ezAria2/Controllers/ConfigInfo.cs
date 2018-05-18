@@ -105,12 +105,33 @@ namespace ezAria2
             File.WriteAllText(@"json.conf", output, Encoding.UTF8); //将output的内容写入json.conf
         }
 
+        /// <summary>
+        /// 加载配置文件，来自json.conf
+        /// </summary>
         public ConfigController() //构造函数
         {
             using (StreamReader sr = new StreamReader(@"json.conf"))
             {
                 LoadConfigFile(sr.ReadToEnd());
             }
+        }
+
+        /// <summary>
+        /// 接收一个ConfigInformation对象，并对其操作
+        /// </summary>
+        /// <param name="e">使用时应加入Out前缀</param>
+        public ConfigController(ConfigInformation e)
+        {
+            Configs = e;
+        }
+
+        /// <summary>
+        /// 接收一个序列化的Json字符串，并对其操作
+        /// </summary>
+        /// <param name="Json_config"></param>
+        public ConfigController(string Json_config)
+        {
+            LoadConfigFile(Json_config); 
         }
     }
 

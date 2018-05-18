@@ -718,7 +718,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.rpc_secret,
             };
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.getGlobalStat", Params);
             return Result;

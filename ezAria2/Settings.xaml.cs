@@ -2,6 +2,7 @@
 using Arthas.Utility.Media;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,19 +24,42 @@ namespace ezAria2
     {
         private bool Str2Bol(String a)//一个安全的办法将conf对象中的字符串内容转换回布尔值
         {
-            if (a=="true")
+            if (a == "true")
             {
                 return true;
             }
             return false;
         }
 
+        private class StringToBoolConverter : IValueConverter
+        {
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                string Value = (string)value;
+                if (Value == "1")
+                    return true;
+                return false;
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                bool Value = (bool)value;
+                if (Value)
+                    return "1";
+                else
+                    return "0";
+            }
+        }
+
+        private ConfigInformation Conf;
+
         public Settings()
         {
+            Conf = Stc.GloConf;
             InitializeComponent();
-            dir.Text = Stc.GloConf.dir;
-            disk_cache.Text = Stc.GloConf.disk_cache;
-            switch (Stc.GloConf.file_allocation)
+            dir.Text = Conf.dir;
+            disk_cache.Text = Conf.disk_cache;
+            switch (Conf.file_allocation)
             {
                 case "none":
                     Disk_None.IsChecked = true;
@@ -50,7 +74,7 @@ namespace ezAria2
                     Disk_Prealloc.IsChecked = true;
                     break;
             }
-            if(Stc.GloConf.@continue=="true")
+            if (Conf.@continue == "true")
             {
                 @continue.IsChecked = true;
                 @continue.Content = "开启";
@@ -62,37 +86,55 @@ namespace ezAria2
             }
 
 
-            max_concurrent_downloads.Text = Stc.GloConf.max_concurrent_downloads;
-            max_connection_per_server.Text = Stc.GloConf.max_connection_per_server;
-            min_split_size.Text = Stc.GloConf.min_split_size;
-            split.Text = Stc.GloConf.split;
-            max_overall_download_limit.Text = Stc.GloConf.max_overall_download_limit;
-            max_download_limit.Text = Stc.GloConf.max_download_limit;
-            max_overall_upload_limit.Text = Stc.GloConf.max_overall_upload_limit;
-            max_upload_limit.Text = Stc.GloConf.max_upload_limit;
-            disable_ipv6.Text = Stc.GloConf.disable_ipv6;
-            timeout.Text = Stc.GloConf.timeout;
-            max_tries.Text = Stc.GloConf.max_tries;
-            retry_wait.Text = Stc.GloConf.retry_wait;
+            max_concurrent_downloads.Text = Conf.max_concurrent_downloads;
+            max_connection_per_server.Text = Conf.max_connection_per_server;
+            min_split_size.Text = Conf.min_split_size;
+            split.Text = Conf.split;
+            max_overall_download_limit.Text = Conf.max_overall_download_limit;
+            max_download_limit.Text = Conf.max_download_limit;
+            max_overall_upload_limit.Text = Conf.max_overall_upload_limit;
+            max_upload_limit.Text = Conf.max_upload_limit;
+            disable_ipv6.Text = Conf.disable_ipv6;
+            timeout.Text = Conf.timeout;
+            max_tries.Text = Conf.max_tries;
+            retry_wait.Text = Conf.retry_wait;
 
-            rpc_secret.Text = Stc.GloConf.rpc_secret;
+            rpc_secret.Text = Conf.rpc_secret;
 
-            follow_torrent.Text = Stc.GloConf.follow_torrent;
-            listen_port.Text = Stc.GloConf.listen_port;
-            bt_max_peers.Text = Stc.GloConf.bt_max_peers;
-            enable_dht.Text = Stc.GloConf.enable_dht;
-            enable_dht6.Text = Stc.GloConf.enable_dht6;
-            dht_listen_port.Text = Stc.GloConf.dht_listen_port;
-            bt_enable_lpd.Text = Stc.GloConf.bt_enable_lpd;
-            enable_peer_exchange.Text = Stc.GloConf.enable_peer_exchange;
-            bt_request_peer_speed_limit.Text = Stc.GloConf.bt_request_peer_speed_limit;
-            peer_id_prefix.Text = Stc.GloConf.peer_id_prefix;
-            user_agent.Text = Stc.GloConf.user_agent;
-            seed_ratio.Text = Stc.GloConf.seed_ratio;
-            force_save.Text = Stc.GloConf.force_save;
-            bt_hash_check_seed.Text = Stc.GloConf.bt_hash_check_seed;
-            bt_seed_unverified.Text = Stc.GloConf.bt_seed_unverified;
-            bt_save_metadata.Text = Stc.GloConf.bt_save_metadata;
+            follow_torrent.Text = Conf.follow_torrent;
+            listen_port.Text = Conf.listen_port;
+            bt_max_peers.Text = Conf.bt_max_peers;
+            enable_dht.Text = Conf.enable_dht;
+            enable_dht6.Text = Conf.enable_dht6;
+            dht_listen_port.Text = Conf.dht_listen_port;
+            bt_enable_lpd.Text = Conf.bt_enable_lpd;
+            enable_peer_exchange.Text = Conf.enable_peer_exchange;
+            bt_request_peer_speed_limit.Text = Conf.bt_request_peer_speed_limit;
+            peer_id_prefix.Text = Conf.peer_id_prefix;
+            user_agent.Text = Conf.user_agent;
+            seed_ratio.Text = Conf.seed_ratio;
+            force_save.Text = Conf.force_save;
+            bt_hash_check_seed.Text = Conf.bt_hash_check_seed;
+            bt_seed_unverified.Text = Conf.bt_seed_unverified;
+            bt_save_metadata.Text = Conf.bt_save_metadata;
+        }
+
+        /// <summary>
+        /// 依照目前的代码，任何设置均将在下次启动时生效。即时更新的机制有待补充
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Enter_Click(object sender, RoutedEventArgs e)
+        {
+            Conf = Stc.GloConf;
+            ConfigController Save = new ConfigController(Conf);
+            Save.SavingConfigFile();
+            Close();
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

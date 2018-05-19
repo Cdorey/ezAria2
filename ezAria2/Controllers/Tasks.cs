@@ -529,7 +529,7 @@ namespace ezAria2
             string[] Uris = new string[] { Uri };
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Uris
             };
             string Gid = (await Stc.Line.JsonRpcAsync("aria2.addUri", Params)).Result;
@@ -545,7 +545,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Uris
             };
             string Gid = (await Stc.Line.JsonRpcAsync("aria2.addUri", Params)).Result;
@@ -562,7 +562,7 @@ namespace ezAria2
             string TorrentBase64 = Base64Encode(Path);
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 TorrentBase64
             };
             string Gid = (await Stc.Line.JsonRpcAsync("aria2.addTorrent", Params)).Result;
@@ -579,7 +579,7 @@ namespace ezAria2
             string MetalinkBase64 = Base64Encode(Path);
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 MetalinkBase64
             };
             string Gid = (await Stc.Line.JsonRpcAsync("aria2.addMetalink", Params)).Result;
@@ -591,7 +591,7 @@ namespace ezAria2
             string[] Gids = new string[] { Gid };
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Gids
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.remove", Params)).Result;
@@ -602,7 +602,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Gid
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.pause", Params)).Result;
@@ -613,7 +613,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.pauseAll", Params)).Result;
         }
@@ -622,7 +622,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Gid
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.unpause", Params)).Result;
@@ -633,7 +633,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
             };
             string Result = (await Stc.Line.JsonRpcAsync("aria2.unpauseAll", Params)).Result;
         }
@@ -643,7 +643,7 @@ namespace ezAria2
             string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Gid,
                 Keys
             };
@@ -655,7 +655,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Gid,
                 Keys
             };
@@ -668,7 +668,7 @@ namespace ezAria2
             string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Keys
             };
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellActive", Params);
@@ -680,7 +680,7 @@ namespace ezAria2
             string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 0,
                 50,
                 Keys
@@ -689,12 +689,16 @@ namespace ezAria2
             return Result;
         }
 
+        /// <summary>
+        /// 查询已停止的任务
+        /// </summary>
+        /// <returns>返回最近50个结果</returns>
         public static async Task<JRCtler.JsonRpcRes> TellStopped()
         {
             string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 0,
                 50,
                 Keys
@@ -707,7 +711,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
                 Gid
             };
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.getFiles", Params);
@@ -718,7 +722,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
             };
             JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.getGlobalStat", Params);
             return Result;
@@ -732,7 +736,7 @@ namespace ezAria2
         {
             ArrayList Params = new ArrayList
             {
-                "token:" + Stc.GloConf.rpc_secret,
+                "token:" + Stc.GloConf.Rpc_secret,
             };
             JRCtler.JsonRpcRes Result = Stc.Line.JsonRpc("aria2.shutdown", Params);
         }

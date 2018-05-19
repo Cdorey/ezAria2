@@ -58,17 +58,17 @@ namespace ezAria2
         {
             ConfigController Start = new ConfigController();
             //判断几个关键的文件和路径是否存在
-            if (!File.Exists(Start.Configs.save_session))
+            if (!File.Exists(Start.Configs.Save_session))
             {
-                File.Create(Start.Configs.save_session).Close();
+                File.Create(Start.Configs.Save_session).Close();
             }
-            if (!File.Exists(Start.Configs.input_file))
+            if (!File.Exists(Start.Configs.Input_file))
             {
-                File.Create(Start.Configs.input_file).Close();
+                File.Create(Start.Configs.Input_file).Close();
             }
-            if (!Directory.Exists(Start.Configs.dir))
+            if (!Directory.Exists(Start.Configs.Dir))
             {
-                Directory.CreateDirectory(Start.Configs.dir);
+                Directory.CreateDirectory(Start.Configs.Dir);
             }
             if (!File.Exists(@"HistoryList.log"))
             {
@@ -82,7 +82,7 @@ namespace ezAria2
             Aria2Process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             Aria2Process.Start();
             GloConf = Start.Configs;//给全局配置变量赋值，同时初始化所有其他全局变量
-            Line = new JRCtler(string.Format("ws://127.0.0.1:{0}/jsonrpc", GloConf.rpc_listen_port));//这里的逻辑重新梳理后，可以允许ezAria2作为客户端，控制其他主机的下载服务
+            Line = new JRCtler(string.Format("ws://127.0.0.1:{0}/jsonrpc", GloConf.Rpc_listen_port));//这里的逻辑重新梳理后，可以允许ezAria2作为客户端，控制其他主机的下载服务
             ProCtl = new ProgressController();
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             Application.Current.Exit += new ExitEventHandler(Quit);

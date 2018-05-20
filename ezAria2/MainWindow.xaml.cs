@@ -88,5 +88,6 @@ namespace ezAria2
             AddTask Task = new AddTask();
             Task.Show();
         }
+
     }
 }

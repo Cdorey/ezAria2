@@ -344,8 +344,8 @@ namespace ezAria2
 
         private void Load()
         {
-            Clear();
-            List<FinishedTask> Historys = null;
+            //Clear();
+            //List<FinishedTask> Historys = null;
             //Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));
             //if (Historys != null)
             //{

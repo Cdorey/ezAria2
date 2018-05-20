@@ -87,7 +87,7 @@ namespace ezAria2
                 else
                 {
                     double i = long.Parse(Completed) * 100 / long.Parse(Total);
-                    return 0;
+                    return i;
                 }
             }
         }
@@ -174,37 +174,42 @@ namespace ezAria2
             OnPropertyChanged("Speed");
 
             //更新状态
-            Status = e.Result.status;
-            switch (Status)
+            string NewStatus = e.Result.status;
+            if (Status!=NewStatus)
             {
-                case "active":
-                    State = "none";
-                    break;
-                case "waiting":
-                    State = "wait";
-                    OughtToRefresh = 5;
-                    break;
-                case "paused":
-                    State = "wait";
-                    OughtToRefresh = 5;
-                    break;
-                case "error":
-                    State = "error";
-                    OughtToRefresh = 10;
-                    break;
-                case "complete":
-                    State = "none";
-                    TaskFinished?.Invoke(this);
-                    OughtToRefresh = 10;
-                    break;
-                case "removed":
-                    State = "error";
-                    OughtToRefresh = 10;
-                    break;
-                default:
-                    State = "wait";
-                    OughtToRefresh = 5;
-                    break;
+                Status = NewStatus;
+                switch (Status)
+                {
+                    case "active":
+                        State = "none";
+                        break;
+                    case "waiting":
+                        State = "wait";
+                        OughtToRefresh = 5;
+                        break;
+                    case "paused":
+                        State = "wait";
+                        OughtToRefresh = 5;
+                        break;
+                    case "error":
+                        State = "error";
+                        OughtToRefresh = 10;
+                        break;
+                    case "complete":
+                        State = "none";
+                        TaskFinished?.Invoke(this);
+                        OughtToRefresh = 10;
+                        break;
+                    case "removed":
+                        State = "error";
+                        OughtToRefresh = 10;
+                        break;
+                    default:
+                        State = "wait";
+                        OughtToRefresh = 5;
+                        break;
+                }
+                OnPropertyChanged("State");
             }
 
             //更新进度
@@ -293,12 +298,6 @@ namespace ezAria2
             }
             Refresh();
         }
-
-        public TaskList()
-        {
-
-        }
-
     }
 
     public class FinishedTask//已完成任务
@@ -347,14 +346,14 @@ namespace ezAria2
         {
             Clear();
             List<FinishedTask> Historys = null;
-            Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));
-            if (Historys != null)
-            {
-                foreach (FinishedTask a in Historys)
-                {
-                    Add(a);
-                }
-            }
+            //Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));
+            //if (Historys != null)
+            //{
+            //    foreach (FinishedTask a in Historys)
+            //    {
+            //        Add(a);
+            //    }
+            //}
             //try
             //{
             //    Historys = JsonConvert.DeserializeObject<List<FinishedTask>>(File.ReadAllText(@"HistoryList.log"));

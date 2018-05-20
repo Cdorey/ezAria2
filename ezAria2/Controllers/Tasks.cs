@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,33 +11,90 @@ using WebSocketSharp;
 
 namespace ezAria2
 {
-    public class TaskLite//小型任务对象,用于任务列表
+    /// <summary>
+    /// 小型任务对象,用于任务列表
+    /// </summary>
+    public class TaskLite : INotifyPropertyChanged
     {
-        private int OughtToRefresh = 3;//归零时刷新
+        private string Completed;//已完成的尺寸
+
+        private string Total;//任务的尺寸
+
+        /// <summary>
+        /// 归零时刷新
+        /// </summary>
+        private int OughtToRefresh = 0;
 
         public delegate void TaskFinish(TaskLite e);
 
         public event TaskFinish TaskFinished;//当前任务的status变成completed时触发
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public enum TaskType
+        {
+            Http,
+            BitTorrent,
+            MetaLink,
+            Ed2k
+        }
+
+        public TaskType Type { get; set; }
+
         public string State { get; set; }//任务的状态
 
-        public string Status { get; set; }//aria2c返回的任务状态，包含更多信息
+        /// <summary>
+        /// aria2c返回的任务状态，包含更多信息
+        /// </summary>
+        private string Status;
 
-        public string Icon { get; set; }//下载文件的图标
+        /// <summary>
+        /// 下载文件的图标
+        /// </summary>
+        public string Icon
+        {
+            get
+            {
+                switch (Type)
+                {
+                    case TaskType.Http:
+                        return "Resources/Icon70/Download.png";
+                    case TaskType.BitTorrent:
+                        return "Resources/Icon70/bt.png";
+                    case TaskType.MetaLink:
+                        return "Resources/Icon70/link.png";
+                    default:
+                        return "Resources/Icon70/web.png";
+                }
+            }
+        }
 
         public string Speed { get; set; }//当前速度
 
-        public double Progress { get; set; } //进度，双精度浮点数
+        public double Progress
+        {
+            get
+            {
+                if (long.Parse(Total) == 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    double i = long.Parse(Completed) * 100 / long.Parse(Total);
+                    return 0;
+                }
+            }
+        }
 
         public string FileName { get; set; }//下载的文件名
 
         public string Gid { get; set; }//任务的GID
-
-        public string Completed { get; set; }//已完成的尺寸
-
-        public string Total { get; set; }//任务的尺寸
-
-        //public RoutedCommand Start=new RoutedCommand()
 
         public async void GetFileInfo()//获得文件信息
         {
@@ -60,33 +118,23 @@ namespace ezAria2
                 int count = x.Result.Count;
                 FileName = path.Substring(path.IndexOf(@"/") + 1, path.LastIndexOf(@"/")) + "，共计" + count.ToString() + "个文件";
             }
+            OnPropertyChanged("FileName");
         }
 
         public async Task Refresh()//刷新任务状态
         {
-            if(OughtToRefresh<=0)
+            if (OughtToRefresh <= 0)
             {
                 JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
                 InformationRefresh(e);
             }
             else
             {
-                OughtToRefresh --;
+                OughtToRefresh--;
             }
         }
 
-        public void StateChangeFunction()
-        {
-            StateChange();
-            OughtToRefresh = 0;
-        }
-
-        public async Task Remove()
-        {
-            await Aria2Methords.Remove(Gid);
-        }
-
-        private async void StateChange()
+        public async void StateChangeFunction()
         {
             if (State == "none")
             {
@@ -98,15 +146,19 @@ namespace ezAria2
                 await Aria2Methords.UpPause(Gid);
                 State = "none";
             }
+            OughtToRefresh = 0;
+            OnPropertyChanged("State");
+        }
+
+        public async Task Remove()
+        {
+            await Aria2Methords.Remove(Gid);
         }
 
         private void InformationRefresh(JRCtler.JsonRpcRes e)
         {
-            Completed = e.Result.completedLength;
-            Total = e.Result.totalLength;
-            string Status = e.Result.status;
-            string SpeedString = e.Result.downloadSpeed;
-            double SpeedLong = double.Parse(SpeedString);
+            //计算当前下载速度
+            double SpeedLong = e.Result.downloadSpeed;
             if (SpeedLong / 1024 == 0)
             {
                 Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
@@ -119,53 +171,51 @@ namespace ezAria2
             {
                 Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
             }
+            OnPropertyChanged("Speed");
+
+            //更新状态
+            Status = e.Result.status;
             switch (Status)
             {
                 case "active":
                     State = "none";
-                    Icon = "Resources/bonfire-1849089_640.png";
                     break;
                 case "waiting":
                     State = "wait";
-                    Icon = "Resources/stopwatch-1849088_640.png";
                     OughtToRefresh = 5;
                     break;
                 case "paused":
                     State = "wait";
-                    Icon = "Resources/cup-1849083_640.png";
                     OughtToRefresh = 5;
                     break;
                 case "error":
                     State = "error";
-                    Icon = "Resources/cup-1849083_640.png";
                     OughtToRefresh = 10;
                     break;
                 case "complete":
                     State = "none";
-                    Icon = "Resources/stopwatch-1849088_640.png";
                     TaskFinished?.Invoke(this);
                     OughtToRefresh = 10;
                     break;
                 case "removed":
                     State = "error";
-                    Icon = "Resources/cup-1849083_640.png";
                     OughtToRefresh = 10;
                     break;
                 default:
                     State = "wait";
-                    Icon = "Resources/cup-1849083_640.png";
                     OughtToRefresh = 5;
                     break;
             }
-            if (e.Result.totalLength == 0)
+
+            //更新进度
+            string CompletedNew = e.Result.completedLength;
+            Total = e.Result.totalLength;
+            if (CompletedNew != Completed)
             {
-                Progress = 0;
+                Completed = CompletedNew;
+                OnPropertyChanged("Progress");
             }
-            else
-            {
-                double i = long.Parse(Completed) * 100 / long.Parse(Total);
-                Progress = i;
-            }
+
             Gid = e.Result.gid;
             GetFileInfo();
             e = null;
@@ -241,7 +291,6 @@ namespace ezAria2
             {
                 Remove(FinishedTaskList.Dequeue());//直接在for或foreach循环中进行remove操作会导致异常
             }
-            OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
             Refresh();
         }
 

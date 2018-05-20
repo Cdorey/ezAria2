@@ -30,14 +30,6 @@ namespace ezAria2
         /// </summary>
         public static DispatcherTimer dispatcherTimer = new DispatcherTimer();
         /// <summary>
-        /// 正在进行的任务列表
-        /// </summary>
-        public static TaskList TaskData;
-        /// <summary>
-        /// 已完成任务列表
-        /// </summary>
-        public static HistoryList HistoryData;
-        /// <summary>
         /// ezAria2 GUI的配置文件
         /// </summary>
         public static ApplicationConfig Config=new ApplicationConfig();
@@ -89,8 +81,6 @@ namespace ezAria2
             Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(Crash);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
-            TaskData = new TaskList();
-            HistoryData = new HistoryList();
         }
     }
 

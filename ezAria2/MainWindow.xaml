@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ezAria2"
         xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas"
         mc:Ignorable="d"
-        Title="ezAria2" Height="600" Width="800" MinWidth="800" MinHeight="600" BorderBrush="#FF146099" Icon="Resources/Umbrella.png" Activated="MetroWindow_Activated">
+        Title="ezAria2" Height="600" Width="800" MinWidth="1200" MinHeight="900" BorderBrush="#FF146099" Icon="Resources/Umbrella.png" Activated="MetroWindow_Activated">
     <Metro:MetroWindow.Menu>
         <Metro:MetroTitleMenu>
             <Metro:MetroTitleMenuItem Header="退出" Click="MetroTitleMenuItem_Click"/>
@@ -146,20 +146,20 @@
             </Setter>
         </Style>
         <DataTemplate x:Key="TaskIcon">
-            <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
+            <Metro:MetroImage Content="MetroImage" Source="{Binding Icon,Mode=OneWay}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
         </DataTemplate>
         <DataTemplate x:Key="TaskFileName">
-            <Grid>
-                <Metro:MetroProgressBar Value="{Binding Progress}" ProgressBarState="{Binding State}" ProgressBarHeight="40" VerticalAlignment="Center" Opacity="0.3" CornerRadius="0"/>
-                <Metro:MetroTextBlock Margin="10"  Text="{Binding FileName}" FontSize="18" VerticalAlignment="Center" Width="{Binding ElementName=WidthHelper, Path=ActualWidth}"/>
-            </Grid>
+            <Metro:MetroTextBlock Margin="10"  Text="{Binding FileName,Mode=OneWay}" FontSize="18" VerticalAlignment="Center" Width="{Binding ElementName=WidthHelperFileName, Path=ActualWidth}"/>
         </DataTemplate>
         <DataTemplate x:Key="TaskSpeed">
-            <Metro:MetroTextBlock Text="{Binding Speed}" FontSize="18" Foreground="#FF667991" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Left" FontStyle="Italic" Margin="10"/>
+            <Grid>
+                <Metro:MetroTextBlock Text="{Binding Speed,Mode=OneWay}" FontSize="18" Foreground="#FF667991" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Left" FontStyle="Italic" Margin="10"/>
+                <Metro:MetroProgressBar Value="{Binding Progress,Mode=OneWay}" ProgressBarState="{Binding State,Mode=OneWay}" Width="{Binding ElementName=WidthHelperProgressBar, Path=ActualWidth}" ProgressBarHeight="40" VerticalAlignment="Center" Opacity="0.3" CornerRadius="0"/>
+            </Grid>
         </DataTemplate>
     </Window.Resources>
     <Grid>
-        <Metro:MetroMenuTabControl Margin="0" FontSize="18" IsHitTestVisible="True" IconMode="True">
+        <Metro:MetroMenuTabControl Margin="0" FontSize="18" IsHitTestVisible="True" IconMode="False">
             <Metro:MetroMenuTabItem Icon="Resources/cloud-2044822_640.png" Header="任务列表" Foreground="Gray" IconMove="Resources/cloud-2044822_640.png" >
                 <Grid Background="#FFE5E5E5">
                     <Grid.RowDefinitions>
@@ -184,19 +184,20 @@
                                 <GridView>
                                     <GridViewColumn Header="类型" Width="40" CellTemplate="{StaticResource TaskIcon}"/>
                                     <!--<GridViewColumn Header="进度" Width="100" DisplayMemberBinding="{Binding Path=WorkPhoneNumber}"/>-->
-                                    <GridViewColumn Header="当前速度" Width="100" CellTemplate="{StaticResource TaskSpeed}"/>
-                                    <GridViewColumn Header="文件名称" Width="{Binding ElementName=WidthHelper, Path=ActualWidth}" CellTemplate="{StaticResource TaskFileName}"/>
+                                    <GridViewColumn Header="当前进度" Width="300" CellTemplate="{StaticResource TaskSpeed}"/>
+                                    <GridViewColumn Header="文件名称" Width="{Binding ElementName=WidthHelperFileName, Path=ActualWidth}" CellTemplate="{StaticResource TaskFileName}"/>
                                 </GridView>
                             </ListView.View>
                         </ListView>
                     </Metro:MetroGroupBox>
                     <Grid Visibility="Hidden">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="300"/>
                             <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="2" x:Name="WidthHelper"/>
+                        <Grid Grid.Column="1" x:Name="WidthHelperProgressBar"/>
+                        <Grid Grid.Column="2" x:Name="WidthHelperFileName"/>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" >
                         <Button Width="70" Height="70" Margin="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click" ToolTip="新建任务">

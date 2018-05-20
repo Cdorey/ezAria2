@@ -9,16 +9,22 @@ namespace ezAria2
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        /// <summary>
+        /// 正在进行的任务列表
+        /// </summary>
+        public static TaskList TaskData = new TaskList();
+        /// <summary>
+        /// 已完成任务列表
+        /// </summary>
+        public static HistoryList HistoryData = new HistoryList();
+
         public MainWindow()
         {
             InitializeComponent();
             Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
-            Stc.TaskData.TaskFinished += Stc.HistoryData.TaskCompleted;
-            //Binding TaskDataBinding = new Binding();
-            //TaskDataBinding.Source = Stc.TaskData;
-            //TaskDataBinding.Mode = BindingMode.OneWay;
-            TasksInProgress.ItemsSource = Stc.TaskData;
-            FinishedList.ItemsSource = Stc.HistoryData;
+            TaskData.TaskFinished += HistoryData.TaskCompleted;
+            TasksInProgress.ItemsSource = TaskData;
+            FinishedList.ItemsSource = HistoryData;
     }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
@@ -33,7 +39,7 @@ namespace ezAria2
             Stc.dispatcherTimer.Tick -= new EventHandler(ListRefresh);
             try
             {
-                await Stc.TaskData.Update();
+                await TaskData.Update();
             }
             finally
             {

@@ -3,13 +3,13 @@
 
 ## 项目截图
 
-![image](http://github.com/Cdorey/ezAria2/raw/master/Pictures/20180521165256.png)
+![image](http://github.com/Cdorey/ezAria2/blob/master/Pictures/20180521165256.png)
 
-![image](http://github.com/Cdorey/ezAria2/raw/master/Pictures/20180521165319.png)
+![image](http://github.com/Cdorey/ezAria2/blob/master/Pictures/20180521165319.png)
 
-![image](http://github.com/Cdorey/ezAria2/raw/master/Pictures/20180521165413.png)
+![image](http://github.com/Cdorey/ezAria2/blob/master/Pictures/20180521165413.png)
 
-![image](http://github.com/Cdorey/ezAria2/raw/master/Pictures/20180521165433.png)
+![image](http://github.com/Cdorey/ezAria2/blob/master/Pictures/20180521165433.png)
 
 ## 开发进度
 * 180422 更新主页面的控件，修复一些脑洞大开的错误，增加系统托盘菜单

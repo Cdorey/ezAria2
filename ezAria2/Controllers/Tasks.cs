@@ -4,9 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using WebSocketSharp;
 
 namespace ezAria2
@@ -303,7 +305,28 @@ namespace ezAria2
     public class FinishedTask//已完成任务
     {
 
-        public System.Drawing.Icon Icon { get; set; }//下载文件的图标
+        public BitmapImage FileIcon
+        {
+            get
+            {
+                Bitmap picture = Icon.ExtractAssociatedIcon(Path).ToBitmap();
+                picture.MakeTransparent(picture.GetPixel(1, 1));
+                return BitmapToBitmapImage(picture);
+            }
+        }
+
+        private BitmapImage BitmapToBitmapImage(Bitmap bitmap)
+        {
+            BitmapImage image = new BitmapImage();
+            MemoryStream ms = new MemoryStream();
+            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+            byte[] bytes = ms.GetBuffer();
+            ms.Close();
+            image.BeginInit();
+            image.StreamSource = new MemoryStream(bytes);
+            image.EndInit();
+            return image;
+        }
 
         public string FileName { get; set; }//下载的文件名
 
@@ -312,12 +335,13 @@ namespace ezAria2
         public string FileSize { get; set; }//文件尺寸
 
         public string FromGid { get; set; }//指示该下载文件来自哪个GID
-
-
     }
 
     public class HistoryList : ObservableCollection<FinishedTask>//历史任务列表
     {
+        /// <summary>
+        /// 归零时保存
+        /// </summary>
         private int KickCount = 0;
 
         private static readonly string HistorayListIsSaving = "HistorayListIsSaving";
@@ -340,7 +364,6 @@ namespace ezAria2
                 }
             }
         }
-
 
         private void Load()
         {
@@ -387,7 +410,6 @@ namespace ezAria2
                         FromGid = e.Gid
                     };
                     a.FileName = a.Path.Substring(a.Path.LastIndexOf(@"/") + 1);
-                    a.Icon = System.Drawing.Icon.ExtractAssociatedIcon(a.Path);
                     Add(a);
                 }
                 FinishedGidList.Add(e.Gid);

@@ -234,7 +234,7 @@
                                             <ColumnDefinition Width="40px"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <Metro:MetroImage Content="MetroImage" Source="{Binding Icon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
+                                        <Metro:MetroImage Content="MetroImage" Source="{Binding FileIcon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
                                         <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="1"/>
                                         <!--<Metro:MetroTextBlock  Text="完成时间：" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2"/>
                                         <Metro:MetroTextBlock  Text="{Binding CompletedTime}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="3"/>-->

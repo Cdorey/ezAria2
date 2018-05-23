@@ -222,6 +222,11 @@ namespace ezAria2
                 Completed = CompletedNew;
                 OnPropertyChanged("Progress");
             }
+            else if (CompletedNew=="0")
+            {
+                State = "wait";
+                OnPropertyChanged("State");
+            }
 
             Gid = e.Result.gid;
             GetFileInfo();

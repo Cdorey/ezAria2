@@ -11,8 +11,8 @@ namespace ezAria2
         {
             //菜单项在这里
             ContextMenu ContextMenu = new ContextMenu();
-            ContextMenu.MenuItems.Add(new MenuItem("粘贴"));
-            ContextMenu.MenuItems.Add(new MenuItem("粘贴"));
+            //ContextMenu.MenuItems.Add(new MenuItem("粘贴"));
+            //ContextMenu.MenuItems.Add(new MenuItem("粘贴"));
             ContextMenu.MenuItems.Add(new MenuItem("退出", new EventHandler(Quit)));
             //设置托盘的各个属性
             NotifyIcon = new NotifyIcon
@@ -21,7 +21,8 @@ namespace ezAria2
                 BalloonTipTitle = "ezAria2",
                 Text = "ezAria2",
                 Visible = true,//托盘按钮是否可见
-                Icon = SystemIcons.Question,//托盘中显示的图标
+                Icon = Properties.Resources.cbuod_gwj75_004
+                //SystemIcons.Question,//托盘中显示的图标
             };
             NotifyIcon.ShowBalloonTip(500);//托盘气泡显示时间
             NotifyIcon.MouseDoubleClick += NotifyIcon_MouseDoubleClick;

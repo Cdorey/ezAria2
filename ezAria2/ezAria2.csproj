@@ -62,7 +62,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>MainIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\cbuod-gwj75-004.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup />
@@ -171,9 +171,11 @@
     <Content Include="aria2c.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\cbuod-gwj75-004.ico" />
+    <Resource Include="Resources\logo2.png" />
+    <Resource Include="Resources\logo.png" />
     <Resource Include="Resources\gear-1077550_640.png" />
     <Resource Include="Resources\setting2.png" />
-    <Resource Include="Resources\setting.png" />
     <Resource Include="Resources\icon40\bt.png" />
     <Resource Include="Resources\icon40\cancel.png" />
     <Resource Include="Resources\icon40\cancel_1.png" />
@@ -192,23 +194,16 @@
     <Resource Include="Resources\icon70\start.png" />
     <Resource Include="Resources\icon70\web.png" />
     <Resource Include="Resources\icon70\空投.png" />
-    <Resource Include="Resources\Umbrella.png" />
     <Resource Include="MainIcon.ico" />
-    <Resource Include="Resources\forward-2831368_640.png" />
     <Resource Include="Resources\bonfire-1849089_640.png" />
     <Resource Include="Resources\cup-1849083_640.png" />
     <Resource Include="Resources\stopwatch-1849088_640.png" />
-    <Resource Include="Resources\flag-1095057_640.png" />
     <Resource Include="Resources\play-1073616_640.png" />
     <Resource Include="Resources\store-1103556_640.png" />
     <Resource Include="Resources\edit-1103599_640.png" />
-    <Resource Include="Resources\close-1540630_640.png" />
     <Resource Include="Resources\cloud-2044797_640.png" />
     <Resource Include="Resources\cloud-2044820_640.png" />
     <Resource Include="Resources\cloud-2044822_640.png" />
-    <Resource Include="Resources\editIcon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

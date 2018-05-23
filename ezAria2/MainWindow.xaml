@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ezAria2"
         xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas"
         mc:Ignorable="d"
-        Title="ezAria2" Height="600" Width="800" MinWidth="1200" MinHeight="900" BorderBrush="#FF146099" Icon="Resources/Umbrella.png" Activated="MetroWindow_Activated">
+        Title="ezAria2" Height="600" Width="800" MinWidth="1200" MinHeight="900" BorderBrush="#FF146099" Icon="Resources/logo2.png" Activated="MetroWindow_Activated">
     <Metro:MetroWindow.Menu>
         <Metro:MetroTitleMenu>
             <Metro:MetroTitleMenuItem Header="退出" Click="MetroTitleMenuItem_Click"/>
@@ -171,14 +171,14 @@
                     </Grid.ColumnDefinitions>
                     <Metro:MetroGroupBox Header="正在进行中的任务" Margin="0,10" FontSize="12">
                         <ListView x:Name="TasksInProgress" HorizontalContentAlignment="Stretch"  Margin="0,0,0,10" >
-                            <ListView.ContextMenu>
+                            <!--<ListView.ContextMenu>
                                 <Metro:MetroContextMenu Name="cm" StaysOpen="true">
                                     <MenuItem Header="粘贴" Foreground="White"/>
                                     <MenuItem Header="粘贴" Foreground="White"/>
                                     <MenuItem Header="粘贴" Foreground="White"/>
                                     <MenuItem Header="粘贴" Foreground="White"/>
                                 </Metro:MetroContextMenu>
-                            </ListView.ContextMenu>
+                            </ListView.ContextMenu>-->
                             <ListView.View>
                                 <!--设置列标签并将列成员与一个变量名称相绑定，以便后台链接修改-->
                                 <GridView>
@@ -228,17 +228,19 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="40px"/>
                                             <ColumnDefinition Width="1*"/>
+                                            <!--<ColumnDefinition Width="40px"/>
                                             <ColumnDefinition Width="40px"/>
                                             <ColumnDefinition Width="40px"/>
-                                            <ColumnDefinition Width="40px"/>
-                                            <ColumnDefinition Width="40px"/>
+                                            <ColumnDefinition Width="40px"/>-->
                                         </Grid.ColumnDefinitions>
 
                                         <Metro:MetroImage Content="MetroImage" Source="{Binding FileIcon}" ImageHeight="40" ImageWidth="40" Grid.Column="0"/>
-                                        <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="1"/>
-                                        <!--<Metro:MetroTextBlock  Text="完成时间：" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2"/>
+                                        <StackPanel Grid.Column="1">
+                                            <Metro:MetroTextBlock  Text="{Binding FileName}" FontSize="16" Foreground="Gray" VerticalAlignment="Center"/>
+                                            <!--<Metro:MetroTextBlock  Text="完成时间：" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="2"/>
                                         <Metro:MetroTextBlock  Text="{Binding CompletedTime}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="3"/>-->
-                                        <Metro:MetroTextBlock  Text="{Binding FileSize}" FontSize="24" Foreground="Gray" VerticalAlignment="Center" Grid.Column="3"/>
+                                            <Metro:MetroTextBlock  Text="{Binding FileSize}" FontSize="16" Foreground="Gray" VerticalAlignment="Center"/>
+                                        </StackPanel>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

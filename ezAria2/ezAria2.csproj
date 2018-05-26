@@ -171,6 +171,9 @@
     <Content Include="aria2c.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="ezAria2.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\cbuod-gwj75-004.ico" />
     <Resource Include="Resources\logo2.png" />
     <Resource Include="Resources\logo.png" />

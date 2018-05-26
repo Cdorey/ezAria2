@@ -25,6 +25,7 @@ namespace ezAria2
             TaskData.TaskFinished += HistoryData.TaskCompleted;
             TasksInProgress.ItemsSource = TaskData;
             FinishedList.ItemsSource = HistoryData;
+            Informations.DataContext = Stc.Config;
     }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)

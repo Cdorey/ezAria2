@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -679,19 +680,61 @@ namespace ezAria2
 
     public class ApplicationConfig //应用程序自身的配置文件
     {
-        public string Aria2cPath;
+        /// <summary>
+        /// aria2c.exe的路径
+        /// </summary>
+        public string Aria2cPath { get; set; }
 
-        public string Aria2cConfigPath;
+        /// <summary>
+        /// aria2c.conf的路径
+        /// </summary>
+        public string Aria2cConfigPath { get; set; }
 
-        public string ApplicationConfigPath;
+        /// <summary>
+        /// ezAria2的配置文件路径
+        /// </summary>
+        public string ApplicationConfigPath { get; set; }
 
-        public string Aria2cConfigJson;
+        /// <summary>
+        /// 这个字段在ezAria2的文件中
+        /// </summary>
+        public string Aria2cConfigJson { get; set; }
+
+        /// <summary>
+        /// WebSocket的地址
+        /// </summary>
+        public string WebSocketPath { get; set; }
+
+        /// <summary>
+        /// Token
+        /// </summary>
+        public string Rpc_secret { get; set; }
+
+        /// <summary>
+        /// 已完成的历史任务列表,这里的逻辑结构有待梳理
+        /// </summary>
+        public List<FinishedTask> HistoryTaskList { get; private set; }
+
+        private static string HistoryTaskListChanging = "HistoryTaskListIsChanging";
+
+        public void HistoryTaskListAdd(FinishedTask e)
+        {
+            lock(HistoryTaskListChanging)
+            {
+                HistoryTaskList.Add(e);
+            }
+        }
+
+        private string HistoryTaskListToJson()
+        {
+            return JsonConvert.SerializeObject(HistoryTaskList);
+        }
 
         public ApplicationConfig()
         {
             Aria2cPath = @"aria2c.exe";
             Aria2cConfigPath = @"aria2.conf";
-            ApplicationConfigPath = @"Config.xml";
+            ApplicationConfigPath = @"ezAria2.xml";
         }
     }
 
@@ -712,6 +755,42 @@ namespace ezAria2
                 return "true";
             else
                 return "false";
+        }
+
+        //public class StringToSliderIntConverter : IValueConverter
+        //{
+        //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        //    {
+        //        string Value = (string)value;
+        //        if (Value.EndsWith("M") & int.TryParse(Value.Remove(Value.Length, 1), out int s))
+        //        {
+        //            return s;
+        //        }
+        //        throw new Exception();
+        //    }
+
+        //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        //    {
+        //        return ((int)value).ToString() + "M";
+        //    }
+        //}
+
+        public class StringToIntConverter : IValueConverter
+        {
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                string Value = (string)value;
+                if (int.TryParse(Value.Remove(Value.Length, 1), out int s))
+                {
+                    return s;
+                }
+                throw new Exception();
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                return ((int)value).ToString();
+            }
         }
     }
 

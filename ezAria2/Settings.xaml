@@ -29,6 +29,38 @@
         <Metro:MetroScrollViewer Margin="0,5,0,50">
             <StackPanel>
                 <Metro:MetroGroupBox Header="文件策略">
+                    <!--<StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock>
+                                <Run Text="文件的保存路径" Foreground="Gray" />
+                            </Metro:MetroTextBlock>
+                            <Metro:MetroTextBox x:Name="dir" Text="{Binding Dir}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock>
+                                <Run Text="文件缓冲区尺寸" Foreground="Gray"/>
+                            </Metro:MetroTextBlock>
+                            <Metro:MetroTextBox x:Name="disk_cache" Text="{Binding Disk_cache}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock>
+                                <Run Text="磁盘预分配规则" Foreground="Gray"/>
+                            </Metro:MetroTextBlock>
+                            <StackPanel x:Name="file_allocation" Orientation="Horizontal" Height="24" VerticalAlignment="Center" Margin="0,10,0,0" >
+                                <RadioButton x:Name="Disk_None" Content="None" Margin="5" Foreground="Gray"/>
+                                <RadioButton x:Name="Disk_Falloc" Content="Falloc" Margin="5" Foreground="Gray"/>
+                                <RadioButton x:Name="Disk_Trunc" Content="Trunc" Margin="5" Foreground="Gray"/>
+                                <RadioButton x:Name="Disk_Prealloc" Content="Prealloc" Margin="5" Foreground="Gray"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel>
+                            <Metro:MetroTextBlock>
+                                <Run Text="中断后继续下载" Foreground="Gray"/>
+                            </Metro:MetroTextBlock>
+                            <Metro:MetroSwitch x:Name="continue" Content="{Binding ElementName=continue,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Continue,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                        </StackPanel>
+
+                    </StackPanel>-->
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>
@@ -129,7 +161,7 @@
                         <Metro:MetroTextBox x:Name="max_download_limit" Text="{Binding Max_download_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1"/>
                         <Metro:MetroTextBox x:Name="max_overall_upload_limit" Text="{Binding Max_overall_upload_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1"/>
                         <Metro:MetroTextBox x:Name="max_upload_limit" Text="{Binding Max_upload_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="disable_ipv6" Text="{Binding Disable_ipv6}" Width="80" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="1"/>
+                        <Metro:MetroSwitch x:Name="disable_ipv6" Content="{Binding ElementName=disable_ipv6,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Disable_ipv6,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
                         <Metro:MetroTextBox x:Name="timeout" Text="{Binding Timeout}" Width="80" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
                         <Metro:MetroTextBox x:Name="max_tries" Text="{Binding Max_tries}" Width="80" HorizontalAlignment="Left" Grid.Row="10" Grid.Column="1"/>
                         <Metro:MetroTextBox x:Name="retry_wait" Text="{Binding Retry_wait}" Width="80" HorizontalAlignment="Left" Grid.Row="11" Grid.Column="1"/>
@@ -147,10 +179,7 @@
                         <Metro:MetroTextBlock >
                             <Run Text="当前的RPC授权令牌" Foreground="Gray" />
                         </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Column="1">
-                            <Run x:Name="rpc_secret" Text="{Binding Rpc_secret}" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-
+                        <Metro:MetroTextBox x:Name="rpc_secret" Text="{Binding Rpc_secret}" Grid.Column="1" IsReadOnly="True"/>
                     </Grid>
                 </Metro:MetroGroupBox>
                 <Metro:MetroGroupBox Header="比特设置">
@@ -227,22 +256,22 @@
                             <Run Text="保存磁力链接元数据为种子文件" Foreground="Gray" />
                         </Metro:MetroTextBlock>
 
-                        <Metro:MetroTextBox x:Name="follow_torrent" Text="{Binding Follow_torrent}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="0"/>
+                        <Metro:MetroSwitch x:Name="follow_torrent" Content="{Binding ElementName=follow_torrent,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Follow_torrent,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
                         <Metro:MetroTextBox x:Name="listen_port" Text="{Binding Listen_port}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="1"/>
                         <Metro:MetroTextBox x:Name="bt_max_peers" Text="{Binding Bt_max_peers}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="2"/>
-                        <Metro:MetroTextBox x:Name="enable_dht" Text="{Binding Enable_dht}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="3"/>
-                        <Metro:MetroTextBox x:Name="enable_dht6" Text="{Binding Enable_dht6}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="4"/>
+                        <Metro:MetroSwitch x:Name="enable_dht" Content="{Binding ElementName=enable_dht,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Enable_dht,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                        <Metro:MetroSwitch x:Name="enable_dht6" Content="{Binding ElementName=enable_dht6,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Enable_dht6,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
                         <Metro:MetroTextBox x:Name="dht_listen_port" Text="{Binding Dht_listen_port}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="5"/>
-                        <Metro:MetroTextBox x:Name="bt_enable_lpd" Text="{Binding Bt_enable_lpd}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="6"/>
-                        <Metro:MetroTextBox x:Name="enable_peer_exchange" Text="{Binding Enable_peer_exchange}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="7"/>
+                        <Metro:MetroSwitch x:Name="bt_enable_lpd" Content="{Binding ElementName=bt_enable_lpd,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Bt_enable_lpd,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                        <Metro:MetroSwitch x:Name="enable_peer_exchange" Content="{Binding ElementName=enable_peer_exchange,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Enable_peer_exchange,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
                         <Metro:MetroTextBox x:Name="bt_request_peer_speed_limit" Text="{Binding Bt_request_peer_speed_limit}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="8"/>
                         <Metro:MetroTextBox x:Name="peer_id_prefix" Width="80" Text="{Binding Peer_id_prefix}" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="9"/>
                         <Metro:MetroTextBox x:Name="user_agent" Width="80" Text="{Binding User_agent}" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="10"/>
                         <Metro:MetroTextBox x:Name="seed_ratio" Width="80" Text="{Binding Seed_ratio}" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="11"/>
-                        <Metro:MetroTextBox x:Name="force_save" Width="80" Text="{Binding Force_save}" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="12"/>
-                        <Metro:MetroTextBox x:Name="bt_hash_check_seed" Text="{Binding Bt_hash_check_seed}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="13"/>
-                        <Metro:MetroTextBox x:Name="bt_seed_unverified" Text="{Binding Bt_seed_unverified}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="14"/>
-                        <Metro:MetroTextBox x:Name="bt_save_metadata" Text="{Binding Bt_save_metadata}" Width="80" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="15"/>
+                        <Metro:MetroSwitch x:Name="force_save" Content="{Binding ElementName=force_save,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Force_save,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="12" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                        <Metro:MetroSwitch x:Name="bt_hash_check_seed" Content="{Binding ElementName=bt_hash_check_seed,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Bt_hash_check_seed,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="13" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                        <Metro:MetroSwitch x:Name="bt_seed_unverified" Content="{Binding ElementName=bt_seed_unverified,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Bt_seed_unverified,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="14" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                        <Metro:MetroSwitch x:Name="bt_save_metadata" Content="{Binding ElementName=bt_save_metadata,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Bt_save_metadata,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="15" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
                     </Grid>
                 </Metro:MetroGroupBox>
             </StackPanel>

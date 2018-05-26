@@ -248,7 +248,10 @@
                     </Metro:MetroGroupBox>
                 </Grid>
             </Metro:MetroMenuTabItem>
-            <Metro:MetroMenuTabItem Header="调试参考" Icon="Resources/edit-1103599_640.png" IconMove="Resources/edit-1103599_640.png">
+            <Metro:MetroMenuTabItem Name="Informations" Header="调试参考" Icon="Resources/edit-1103599_640.png" IconMove="Resources/edit-1103599_640.png">
+                <!--<Metro:MetroMenuTabItem.DataContext>
+                    <local:ConfigInformation/>
+                </Metro:MetroMenuTabItem.DataContext>-->
                 <Metro:MetroGroupBox Header="您可能需要以下信息以使用其他开发者制作的Aria2的脚本" Margin="0,10" FontSize="12">
                     <StackPanel>
                         <Metro:MetroTextBlock>
@@ -256,13 +259,13 @@
                                 下载引擎的RPC地址：
                             </Run>
                         </Metro:MetroTextBlock>
-                        <Metro:MetroTextBox x:Name="RpcAdress" IsReadOnly="True"/>
+                        <Metro:MetroTextBox Text="{Binding WebSocketPath}" IsReadOnly="True"/>
                         <Metro:MetroTextBlock>
                             <Run>
                                 用于RPC连接的令牌（Token）：
                             </Run>
                         </Metro:MetroTextBlock>
-                        <Metro:MetroTextBox x:Name="RpcToken" IsReadOnly="True"/>
+                        <Metro:MetroTextBox Text="{Binding Rpc_secret}" IsReadOnly="True"/>
                     </StackPanel>
                 </Metro:MetroGroupBox>
             </Metro:MetroMenuTabItem>

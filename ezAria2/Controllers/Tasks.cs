@@ -46,6 +46,14 @@ namespace ezAria2
             Ed2k
         }
 
+        private enum FileNameSources
+        {
+            Path,
+            Uri
+        }
+
+        private FileNameSources FileNameSource;
+
         public TaskType Type { get; set; }
 
         public string State { get; set; }//任务的状态
@@ -103,15 +111,17 @@ namespace ezAria2
             JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
             if (x.Result.Count == 1)
             {
-                string uri = x.Result[0].uris[0].uri;
-                if (uri != null)
+                string filepath = x.Result[0].path;
+                if(filepath != null)
                 {
-                    FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
+                    FileName = filepath.Substring(filepath.LastIndexOf(@"/") + 1);
+                    FileNameSource = FileNameSources.Path;
                 }
                 else
                 {
-                    string path = x.Result[0].path;
-                    FileName = path.Substring(path.LastIndexOf(@"/") + 1);
+                    string uri = x.Result[0].uris[0].uri;
+                    FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
+                    FileNameSource = FileNameSources.Uri;
                 }
             }
             else
@@ -162,17 +172,11 @@ namespace ezAria2
             //计算当前下载速度
             double SpeedLong = e.Result.downloadSpeed;
             if (SpeedLong / 1024 == 0)
-            {
                 Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
-            }
             else if (SpeedLong / 1048576 == 0)
-            {
                 Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
-            }
             else
-            {
                 Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
-            }
             OnPropertyChanged("Speed");
 
             //更新状态
@@ -229,7 +233,8 @@ namespace ezAria2
             }
 
             Gid = e.Result.gid;
-            GetFileInfo();
+            if (FileName==null||FileNameSource != FileNameSources.Path)
+                GetFileInfo();
             e = null;
         }
 

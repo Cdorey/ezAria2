@@ -21,6 +21,7 @@
         </Style>
         <local:StringToBoolConverter x:Key="S2B"/>
         <local:BoolToStringConverter x:Key="B2S"/>
+        <local:StringToIntConverter x:Key="S2I"/>
     </Window.Resources>
     <Grid Background="#FFE5E5E5">
         <Metro:MetroButton x:Name="Cancel" Content="取消" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Click="Cancel_Click"/>
@@ -86,7 +87,10 @@
                         </Metro:MetroTextBlock>
 
                         <Metro:MetroTextBox x:Name="dir" Text="{Binding Dir}" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="disk_cache" Text="{Binding Disk_cache}" Grid.Row="1" Grid.Column="1"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <Slider x:Name="disk_cache" Value="{Binding Disk_cache,Converter={StaticResource S2I},ConverterParameter=Storage}" IsSnapToTickEnabled="True" Maximum="256" TickFrequency="8" TickPlacement="BottomRight" Foreground="#FF146099" Width="350"/>
+                            <TextBlock Text="{Binding Disk_cache,Mode=OneWay}" Foreground="#FF146099"/>
+                        </StackPanel>
                         <StackPanel x:Name="file_allocation" Orientation="Horizontal" Height="24" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Margin="0,10,0,0" >
                             <RadioButton x:Name="Disk_None" Content="None" Margin="5" Foreground="Gray"/>
                             <RadioButton x:Name="Disk_Falloc" Content="Falloc" Margin="5" Foreground="Gray"/>
@@ -153,7 +157,8 @@
                             <Run Text="设置重试等待的秒数" Foreground="Gray" />
                         </Metro:MetroTextBlock>
 
-                        <Metro:MetroTextBox x:Name="max_concurrent_downloads" Text="{Binding Max_concurrent_downloads}" Width="80" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="{Binding Max_concurrent_downloads}" Width="80" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1"/>
+                        <Slider x:Name="max_concurrent_downloads" Value="{Binding Max_concurrent_downloads,Converter={StaticResource S2I}}" IsSnapToTickEnabled="True" TickFrequency="1" Grid.Row="0" Grid.Column="1" TickPlacement="BottomRight" Foreground="#FF146099" Width="250" Minimum="1"/>
                         <Metro:MetroTextBox x:Name="max_connection_per_server" Text="{Binding Max_connection_per_server}" Width="80" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
                         <Metro:MetroTextBox x:Name="min_split_size" Width="80" Text="{Binding Min_split_size}" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
                         <Metro:MetroTextBox x:Name="split" Text="{Binding Split}" Width="80" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1"/>

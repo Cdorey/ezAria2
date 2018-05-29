@@ -757,41 +757,6 @@ namespace ezAria2
                 return "false";
         }
 
-        //public class StringToSliderIntConverter : IValueConverter
-        //{
-        //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        //    {
-        //        string Value = (string)value;
-        //        if (Value.EndsWith("M") & int.TryParse(Value.Remove(Value.Length, 1), out int s))
-        //        {
-        //            return s;
-        //        }
-        //        throw new Exception();
-        //    }
-
-        //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        //    {
-        //        return ((int)value).ToString() + "M";
-        //    }
-        //}
-
-        public class StringToIntConverter : IValueConverter
-        {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                string Value = (string)value;
-                if (int.TryParse(Value.Remove(Value.Length, 1), out int s))
-                {
-                    return s;
-                }
-                throw new Exception();
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                return ((int)value).ToString();
-            }
-        }
     }
 
     public class BoolToStringConverter : IValueConverter
@@ -811,6 +776,44 @@ namespace ezAria2
                 return "1";
             else
                 return "0";
+        }
+    }
+
+    /// <summary>
+    /// 一个转换器将字符串转换成整型，如果这个字符串带单位，parameter参数是这个单位的内容
+    /// </summary>
+    public class StringToIntConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string Value = (string)value;
+            if (parameter == null & int.TryParse(Value, out int s))
+            {
+                return s;
+            }
+            else if ((string)parameter =="Storage" & int.TryParse(Value.Remove(Value.Length - 1, 1), out int a))
+            {
+                if (Value.EndsWith("M"))
+                    return a;
+                else
+                    throw new Exception();
+            }
+            else
+                throw new Exception();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int Value = (int)((double)value);
+            if (parameter == null)
+            {
+                return Value.ToString();
+            }
+            else if((string)parameter=="Storage")
+            {
+                return Value.ToString() + "M";
+            }
+            throw new Exception();
         }
     }
 

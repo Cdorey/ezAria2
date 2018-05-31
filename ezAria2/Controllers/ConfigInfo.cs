@@ -42,8 +42,15 @@ namespace ezAria2
             }
         }
 
-        private string file_allocation;
-        public string File_allocation
+        public enum FileAllocationEnum
+        {
+            none,
+            falloc,
+            trunc,
+            prealloc
+        }
+        private FileAllocationEnum file_allocation;
+        public FileAllocationEnum File_allocation
         {
             get
             {
@@ -814,6 +821,25 @@ namespace ezAria2
                 return Value.ToString() + "M";
             }
             throw new Exception();
+        }
+    }
+
+    public class StringToFileAllocationEnum : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            ConfigInformation.FileAllocationEnum s = (ConfigInformation.FileAllocationEnum)value;
+            return s == (ConfigInformation.FileAllocationEnum)int.Parse(parameter.ToString());
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool isChecked = (bool)value;
+            if (!isChecked)
+            {
+                return null;
+            }
+            return (ConfigInformation.FileAllocationEnum)int.Parse(parameter.ToString());
         }
     }
 

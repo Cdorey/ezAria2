@@ -10,6 +10,7 @@
     <Window.Resources>
         <Style TargetType="Metro:MetroTextBlock">
             <Setter Property="Margin"  Value="0,10,0,0"/>
+            <Setter Property="Foreground" Value="Gray"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="Height" Value="24"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -22,6 +23,7 @@
         <local:StringToBoolConverter x:Key="S2B"/>
         <local:BoolToStringConverter x:Key="B2S"/>
         <local:StringToIntConverter x:Key="S2I"/>
+        <local:StringToFileAllocationEnum x:Key="S2FAE"/>
     </Window.Resources>
     <Grid Background="#FFE5E5E5">
         <Metro:MetroButton x:Name="Cancel" Content="取消" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Click="Cancel_Click"/>
@@ -30,164 +32,102 @@
         <Metro:MetroScrollViewer Margin="0,5,0,50">
             <StackPanel>
                 <Metro:MetroGroupBox Header="文件策略">
-                    <!--<StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Metro:MetroTextBlock>
-                                <Run Text="文件的保存路径" Foreground="Gray" />
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBox x:Name="dir" Text="{Binding Dir}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Metro:MetroTextBlock>
-                                <Run Text="文件缓冲区尺寸" Foreground="Gray"/>
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroTextBox x:Name="disk_cache" Text="{Binding Disk_cache}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Metro:MetroTextBlock>
-                                <Run Text="磁盘预分配规则" Foreground="Gray"/>
-                            </Metro:MetroTextBlock>
-                            <StackPanel x:Name="file_allocation" Orientation="Horizontal" Height="24" VerticalAlignment="Center" Margin="0,10,0,0" >
-                                <RadioButton x:Name="Disk_None" Content="None" Margin="5" Foreground="Gray"/>
-                                <RadioButton x:Name="Disk_Falloc" Content="Falloc" Margin="5" Foreground="Gray"/>
-                                <RadioButton x:Name="Disk_Trunc" Content="Trunc" Margin="5" Foreground="Gray"/>
-                                <RadioButton x:Name="Disk_Prealloc" Content="Prealloc" Margin="5" Foreground="Gray"/>
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel>
-                            <Metro:MetroTextBlock>
-                                <Run Text="中断后继续下载" Foreground="Gray"/>
-                            </Metro:MetroTextBlock>
-                            <Metro:MetroSwitch x:Name="continue" Content="{Binding ElementName=continue,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Continue,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" HorizontalAlignment="Left" Margin="0,10,0,0" />
-                        </StackPanel>
+                    <StackPanel>
+                        <Metro:MetroTextBlock Text="文件的保存路径："/>
+                        <Metro:MetroTextBox x:Name="dir" Text="{Binding Dir}"/>
 
-                    </StackPanel>-->
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="7*"/>
-                        </Grid.ColumnDefinitions>
-                        <Metro:MetroTextBlock Grid.Row="0">
-                            <Run Text="文件的保存路径" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="1">
-                            <Run Text="文件缓冲区尺寸" Foreground="Gray"/>
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="2">
-                            <Run Text="磁盘预分配规则" Foreground="Gray"/>
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="3">
-                            <Run Text="中断后继续下载" Foreground="Gray"/>
-                        </Metro:MetroTextBlock>
-
-                        <Metro:MetroTextBox x:Name="dir" Text="{Binding Dir}" Grid.Column="1"/>
+                        <Metro:MetroTextBlock Text="文件缓冲区尺寸："/>
                         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                             <Slider x:Name="disk_cache" Value="{Binding Disk_cache,Converter={StaticResource S2I},ConverterParameter=Storage}" IsSnapToTickEnabled="True" Maximum="256" TickFrequency="8" TickPlacement="BottomRight" Foreground="#FF146099" Width="350"/>
-                            <TextBlock Text="{Binding Disk_cache,Mode=OneWay}" Foreground="#FF146099"/>
+                            <Metro:MetroTextBlock Text="{Binding Disk_cache,Mode=OneWay}" Foreground="#FF146099"/>
                         </StackPanel>
-                        <StackPanel x:Name="file_allocation" Orientation="Horizontal" Height="24" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Margin="0,10,0,0" >
-                            <RadioButton x:Name="Disk_None" Content="None" Margin="5" Foreground="Gray"/>
-                            <RadioButton x:Name="Disk_Falloc" Content="Falloc" Margin="5" Foreground="Gray"/>
-                            <RadioButton x:Name="Disk_Trunc" Content="Trunc" Margin="5" Foreground="Gray"/>
-                            <RadioButton x:Name="Disk_Prealloc" Content="Prealloc" Margin="5" Foreground="Gray"/>
+
+                        <Metro:MetroTextBlock Text="磁盘预分配规则："/>
+                        <StackPanel x:Name="file_allocation" Orientation="Horizontal" Height="24" VerticalAlignment="Center" Margin="0,10,0,0" >
+                            <RadioButton x:Name="Disk_None" IsChecked="{Binding File_allocation,Converter={StaticResource S2FAE}, ConverterParameter=0}" Content="None" Margin="5" Foreground="Gray"/>
+                            <RadioButton x:Name="Disk_Falloc" IsChecked="{Binding File_allocation,Converter={StaticResource S2FAE}, ConverterParameter=1}" Content="Falloc" Margin="5" Foreground="Gray"/>
+                            <RadioButton x:Name="Disk_Trunc" IsChecked="{Binding File_allocation,Converter={StaticResource S2FAE}, ConverterParameter=2}" Content="Trunc" Margin="5" Foreground="Gray"/>
+                            <RadioButton x:Name="Disk_Prealloc" IsChecked="{Binding File_allocation,Converter={StaticResource S2FAE}, ConverterParameter=3}" Content="Prealloc" Margin="5" Foreground="Gray"/>
                         </StackPanel>
-                        <Metro:MetroSwitch x:Name="continue" Content="{Binding ElementName=continue,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Continue,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
-                    </Grid>
+
+                        <Metro:MetroTextBlock Text="中断后继续下载："/>
+                        <Metro:MetroSwitch x:Name="continue" Content="{Binding ElementName=continue,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Continue,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" HorizontalAlignment="Left" Margin="0,10,0,0" />
+
+                    </StackPanel>
                 </Metro:MetroGroupBox >
                 <Metro:MetroGroupBox Header="下载选项">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="7*"/>
-                        </Grid.ColumnDefinitions>
-                        <Metro:MetroTextBlock Grid.Row="0">
-                            <Run Text="最大同时下载任务数" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="1">
-                            <Run Text="同一服务器连接数" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="2">
-                            <Run Text="最小文件分片大小" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="3">
-                            <Run Text="单个任务最大线程数" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="4">
-                            <Run Text="整体下载速度限制" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="5">
-                            <Run Text="单个任务下载速度限制" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="6">
-                            <Run Text="整体上传速度限制" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="7">
-                            <Run Text="单个任务上传速度限制" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="8">
-                            <Run Text="IPv6" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="9">
-                            <Run Text="连接超时时间" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="10">
-                            <Run Text="最大重试次数" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBlock Grid.Row="11">
-                            <Run Text="设置重试等待的秒数" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="最大同时下载任务数"/>
+                            <Slider x:Name="max_concurrent_downloads" Value="{Binding Max_concurrent_downloads,Converter={StaticResource S2I}}" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="BottomRight" Foreground="#FF146099" Width="250" Maximum="50" Minimum="1"/>
+                            <Metro:MetroTextBlock Text="{Binding Max_concurrent_downloads}" Width="80" HorizontalAlignment="Left" Foreground="#FF146099"/>
+                        </StackPanel>
 
-                        <TextBlock Text="{Binding Max_concurrent_downloads}" Width="80" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1"/>
-                        <Slider x:Name="max_concurrent_downloads" Value="{Binding Max_concurrent_downloads,Converter={StaticResource S2I}}" IsSnapToTickEnabled="True" TickFrequency="1" Grid.Row="0" Grid.Column="1" TickPlacement="BottomRight" Foreground="#FF146099" Width="250" Minimum="1"/>
-                        <Metro:MetroTextBox x:Name="max_connection_per_server" Text="{Binding Max_connection_per_server}" Width="80" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="min_split_size" Width="80" Text="{Binding Min_split_size}" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="split" Text="{Binding Split}" Width="80" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="max_overall_download_limit" Text="{Binding Max_overall_download_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="max_download_limit" Text="{Binding Max_download_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="max_overall_upload_limit" Text="{Binding Max_overall_upload_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="max_upload_limit" Text="{Binding Max_upload_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
-                        <Metro:MetroSwitch x:Name="disable_ipv6" Content="{Binding ElementName=disable_ipv6,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Disable_ipv6,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
-                        <Metro:MetroTextBox x:Name="timeout" Text="{Binding Timeout}" Width="80" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="max_tries" Text="{Binding Max_tries}" Width="80" HorizontalAlignment="Left" Grid.Row="10" Grid.Column="1"/>
-                        <Metro:MetroTextBox x:Name="retry_wait" Text="{Binding Retry_wait}" Width="80" HorizontalAlignment="Left" Grid.Row="11" Grid.Column="1"/>
-                    </Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="同一服务器连接数"/>
+                            <Metro:MetroTextBox x:Name="max_connection_per_server" Text="{Binding Max_connection_per_server}" Width="80" HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="最小文件分片大小" />
+                            <Metro:MetroTextBox x:Name="min_split_size" Width="80" Text="{Binding Min_split_size}" HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="单个任务最大线程数" />
+                            <Metro:MetroTextBox x:Name="split" Text="{Binding Split}" Width="80" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="整体下载速度限制" />
+                            <Metro:MetroTextBox x:Name="max_overall_download_limit" Text="{Binding Max_overall_download_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="1"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="单个任务下载速度限制" />
+                            <Metro:MetroTextBox x:Name="max_download_limit" Text="{Binding Max_download_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="整体上传速度限制" />
+                            <Metro:MetroTextBox x:Name="max_overall_upload_limit" Text="{Binding Max_overall_upload_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="单个任务上传速度限制" />
+                            <Metro:MetroTextBox x:Name="max_upload_limit" Text="{Binding Max_upload_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="禁用IPv6" />
+                            <Metro:MetroSwitch x:Name="disable_ipv6" Content="{Binding ElementName=disable_ipv6,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Disable_ipv6,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="连接超时时间" />
+                            <Metro:MetroTextBox x:Name="timeout" Text="{Binding Timeout}" Width="80" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="最大重试次数" />
+                            <Metro:MetroTextBox x:Name="max_tries" Text="{Binding Max_tries}" Width="80" HorizontalAlignment="Left" Grid.Row="10" Grid.Column="1"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="设置重试等待的秒数" />
+                            <Metro:MetroTextBox x:Name="retry_wait" Text="{Binding Retry_wait}" Width="80" HorizontalAlignment="Left" Grid.Row="11" Grid.Column="1"/>
+                        </StackPanel>
+                    </StackPanel>
                 </Metro:MetroGroupBox>
                 <Metro:MetroGroupBox Header="接口信息">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="7*"/>
-                        </Grid.ColumnDefinitions>
-                        <Metro:MetroTextBlock >
-                            <Run Text="当前的RPC授权令牌" Foreground="Gray" />
-                        </Metro:MetroTextBlock>
-                        <Metro:MetroTextBox x:Name="rpc_secret" Text="{Binding Rpc_secret}" Grid.Column="1" IsReadOnly="True"/>
-                    </Grid>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Metro:MetroTextBlock Text="当前的RPC授权令牌" />
+                            <Metro:MetroTextBox x:Name="rpc_secret" Text="{Binding Rpc_secret}" IsReadOnly="True"/>
+                        </StackPanel>
+                    </StackPanel>
                 </Metro:MetroGroupBox>
-                <Metro:MetroGroupBox Header="比特设置">
+                <Metro:MetroGroupBox Header="Bittorrent设置">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>

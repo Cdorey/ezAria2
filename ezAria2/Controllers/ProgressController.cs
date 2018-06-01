@@ -21,7 +21,7 @@ namespace ezAria2
                 BalloonTipTitle = "ezAria2",
                 Text = "ezAria2",
                 Visible = true,//托盘按钮是否可见
-                Icon = Properties.Resources.cbuod_gwj75_004
+                Icon = Properties.Resources.Download
                 //SystemIcons.Question,//托盘中显示的图标
             };
             NotifyIcon.ShowBalloonTip(500);//托盘气泡显示时间

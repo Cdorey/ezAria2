@@ -75,47 +75,47 @@
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="单个任务最大线程数" />
-                            <Metro:MetroTextBox x:Name="split" Text="{Binding Split}" Width="80" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1"/>
+                            <Metro:MetroTextBox x:Name="split" Text="{Binding Split}" Width="80" HorizontalAlignment="Left" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="整体下载速度限制" />
-                            <Metro:MetroTextBox x:Name="max_overall_download_limit" Text="{Binding Max_overall_download_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="1"/>
+                            <Metro:MetroTextBox x:Name="max_overall_download_limit" Text="{Binding Max_overall_download_limit}" Width="80" HorizontalAlignment="Left" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="单个任务下载速度限制" />
-                            <Metro:MetroTextBox x:Name="max_download_limit" Text="{Binding Max_download_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1"/>
+                            <Metro:MetroTextBox x:Name="max_download_limit" Text="{Binding Max_download_limit}" Width="80" HorizontalAlignment="Left" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="整体上传速度限制" />
-                            <Metro:MetroTextBox x:Name="max_overall_upload_limit" Text="{Binding Max_overall_upload_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1"/>
+                            <Metro:MetroTextBox x:Name="max_overall_upload_limit" Text="{Binding Max_overall_upload_limit}" Width="80" HorizontalAlignment="Left" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="单个任务上传速度限制" />
-                            <Metro:MetroTextBox x:Name="max_upload_limit" Text="{Binding Max_upload_limit}" Width="80" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
+                            <Metro:MetroTextBox x:Name="max_upload_limit" Text="{Binding Max_upload_limit}" Width="80" HorizontalAlignment="Left" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="禁用IPv6" />
-                            <Metro:MetroSwitch x:Name="disable_ipv6" Content="{Binding ElementName=disable_ipv6,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Disable_ipv6,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                            <Metro:MetroSwitch x:Name="disable_ipv6" Content="{Binding ElementName=disable_ipv6,Path=IsChecked,Converter={StaticResource B2S}}" IsChecked="{Binding Disable_ipv6,Converter={StaticResource S2B}}" VerticalAlignment="Center" CornerRadius="2" BorderCornerRadius="3" HorizontalAlignment="Left" Margin="0,10,0,0" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="连接超时时间" />
-                            <Metro:MetroTextBox x:Name="timeout" Text="{Binding Timeout}" Width="80" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
+                            <Metro:MetroTextBox x:Name="timeout" Text="{Binding Timeout}" Width="80" HorizontalAlignment="Left" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="最大重试次数" />
-                            <Metro:MetroTextBox x:Name="max_tries" Text="{Binding Max_tries}" Width="80" HorizontalAlignment="Left" Grid.Row="10" Grid.Column="1"/>
+                            <Metro:MetroTextBox x:Name="max_tries" Text="{Binding Max_tries}" Width="80" HorizontalAlignment="Left" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="设置重试等待的秒数" />
-                            <Metro:MetroTextBox x:Name="retry_wait" Text="{Binding Retry_wait}" Width="80" HorizontalAlignment="Left" Grid.Row="11" Grid.Column="1"/>
+                            <Metro:MetroTextBox x:Name="retry_wait" Text="{Binding Retry_wait}" Width="80" HorizontalAlignment="Left" />
                         </StackPanel>
                     </StackPanel>
                 </Metro:MetroGroupBox>

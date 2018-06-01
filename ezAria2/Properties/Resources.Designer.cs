@@ -71,11 +71,12 @@ namespace ezAria2.Properties {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似于 (图标) 的 System.Drawing.Icon 类型的本地化资源。
         /// </summary>
-        internal static string MainIcon {
+        internal static System.Drawing.Icon Download {
             get {
-                return ResourceManager.GetString("MainIcon", resourceCulture);
+                object obj = ResourceManager.GetObject("Download", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

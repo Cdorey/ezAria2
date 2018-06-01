@@ -121,7 +121,7 @@
   <data name="cbuod_gwj75_004" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\cbuod-gwj75-004.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MainIcon" xml:space="preserve">
-    <value />
+  <data name="Download" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\download.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -171,6 +171,7 @@
     <Content Include="aria2c.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\Download.ico" />
     <Resource Include="ezAria2.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

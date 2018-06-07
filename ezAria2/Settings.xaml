@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ezAria2"
         xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas"
         mc:Ignorable="d"
-        Title="设置" Height="450" Width="600" MinWidth="600" MinHeight="450" BorderBrush="#FF146099" Icon="Resources/gear-1077550_640.png">
+        Title="设置" Height="450" Width="600" MinWidth="600" MinHeight="450" BorderBrush="#FF146099" Icon="Resources/gear-1077550_640.png" WindowStyle="None" >
     <Window.Resources>
         <Style TargetType="Metro:MetroTextBlock">
             <Setter Property="Margin"  Value="10,0"/>
@@ -44,7 +44,7 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Metro:MetroTextBlock Text="文件的保存路径："/>
-                            <Button Content="浏览"/>
+                            <Button Content="浏览" Name="FolderBrowserDialogButton" Click="FolderBrowserDialogButton_Click"/>
                         </StackPanel>
                         <Metro:MetroTextBox x:Name="dir" Text="{Binding Dir}"/>
 

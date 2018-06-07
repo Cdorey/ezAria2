@@ -18,6 +18,7 @@
 * 180514 修正多个错误，增加机制降低轮询频率，增加关闭窗口后台运行
 * 180516 注释掉了主页面那个并没有什么卵用的按钮，加入避免多实例运行的机制
 * 180519 完成设置页面的设计和变量绑定
+* 180607 完善设置页面逻辑
 
 ## 预期功能
 
@@ -29,3 +30,4 @@
 * 依照GPL V2许可发布
 * [Arthas的WPF开源控件类库](https://github.com/1217950746/Arthas-WPFUI)MIT许可
 * [Websocket-Sharp](https://github.com/sta/websocket-sharp)MIT许可
+* [KnownFolders](https://github.com/Syroot/KnownFolders)MIT许可

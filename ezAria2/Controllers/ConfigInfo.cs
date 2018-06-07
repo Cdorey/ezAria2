@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Syroot.Windows.IO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -602,11 +603,18 @@ namespace ezAria2
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public ConfigInformation Copy()
+        {
+            return (ConfigInformation)MemberwiseClone();
+        }
     }
 
     public class ConfigController //配置文件控制器
     {
         public ConfigInformation Configs = new ConfigInformation();
+
+
 
         /// <summary>
         /// 序列化配置文件为ConfigInformation对象
@@ -628,6 +636,11 @@ namespace ezAria2
                     Configs.Rpc_secret = Configs.Rpc_secret + b;
                     i = i + 1;
                 }
+            }
+            if (Configs.Dir=="")
+            {
+                KnownFolder DownloadFolder = new KnownFolder(KnownFolderType.Downloads);
+                Configs.Dir = DownloadFolder.Path;
             }
         }
 

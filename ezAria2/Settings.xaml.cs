@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -23,11 +24,13 @@ namespace ezAria2
     public partial class Settings : MetroWindow
     {
 
-        private ConfigInformation Conf;
+        private ConfigInformation Conf =new ConfigInformation();
+
+        private FolderBrowserDialog folderBrowserDialog=new FolderBrowserDialog();
 
         public Settings()
         {
-            Conf = Stc.GloConf;
+            Conf = Stc.GloConf.Copy();
             InitializeComponent();
             DataContext = Conf;
         }
@@ -39,7 +42,7 @@ namespace ezAria2
         /// <param name="e"></param>
         private void Enter_Click(object sender, RoutedEventArgs e)
         {
-            Conf = Stc.GloConf;
+            Stc.GloConf = Conf;
             ConfigController Save = new ConfigController(Conf);
             Save.SavingConfigFile();
             Close();
@@ -48,6 +51,12 @@ namespace ezAria2
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void FolderBrowserDialogButton_Click(object sender, RoutedEventArgs e)
+        {
+            folderBrowserDialog.ShowDialog();
+            Conf.Dir = folderBrowserDialog.SelectedPath;
         }
     }
 }

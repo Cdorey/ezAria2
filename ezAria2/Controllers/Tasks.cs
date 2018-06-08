@@ -8,6 +8,8 @@ using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using WebSocketSharp;
 
@@ -18,14 +20,138 @@ namespace ezAria2
     /// </summary>
     public class TaskLite : INotifyPropertyChanged
     {
-        private string Completed;//已完成的尺寸
+        protected string Completed;//已完成的尺寸
 
-        private string Total;//任务的尺寸
+        protected string Total;//任务的尺寸
+
+        /// <summary>
+        /// aria2c返回的任务状态，包含更多信息
+        /// </summary>
+        protected string Status;
+
+        /// <summary>
+        /// 枚举文件名的来源
+        /// </summary>
+        protected enum FileNameSources
+        {
+            Path,
+            Uri
+        }
+
+        /// <summary>
+        /// 当前任务的文件名的来源，可能是通过URL推测，也可能是来自ARIA2C返回的文件路径
+        /// </summary>
+        protected FileNameSources FileNameSource;
 
         /// <summary>
         /// 归零时刷新
         /// </summary>
-        private int OughtToRefresh = 0;
+        protected int OughtToRefresh = 0;
+
+        /// <summary>
+        /// 解析一个RPC调用结果以更新当前任务
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void InformationRefresh(JRCtler.JsonRpcRes e)
+        {
+            //计算当前下载速度
+            double SpeedLong = e.Result.downloadSpeed;
+            if (SpeedLong / 1024 == 0)
+                Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
+            else if (SpeedLong / 1048576 == 0)
+                Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
+            else
+                Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
+            OnPropertyChanged("Speed");
+
+            //更新状态
+            string NewStatus = e.Result.status;
+            if (Status != NewStatus)
+            {
+                Status = NewStatus;
+                switch (Status)
+                {
+                    case "active":
+                        State = "none";
+                        break;
+                    case "waiting":
+                        State = "wait";
+                        OughtToRefresh = 5;
+                        break;
+                    case "paused":
+                        State = "error";
+                        OughtToRefresh = 5;
+                        break;
+                    case "error":
+                        State = "error";
+                        OughtToRefresh = 10;
+                        break;
+                    case "complete":
+                        State = "none";
+                        TaskFinished?.Invoke(this);
+                        OughtToRefresh = 10;
+                        break;
+                    case "removed":
+                        State = "error";
+                        OughtToRefresh = 10;
+                        break;
+                    default:
+                        State = "wait";
+                        OughtToRefresh = 5;
+                        break;
+                }
+                OnPropertyChanged("State");
+            }
+
+            //更新进度
+            string CompletedNew = e.Result.completedLength;
+            Total = e.Result.totalLength;
+            if (CompletedNew != Completed)
+            {
+                Completed = CompletedNew;
+                OnPropertyChanged("Progress");
+            }
+            else if (CompletedNew == "0")
+            {
+                State = "wait";
+                OnPropertyChanged("State");
+            }
+
+            Gid = e.Result.gid;
+            if (FileName == null || FileNameSource != FileNameSources.Path)
+                GetFileInfo();
+            e = null;
+        }
+
+        /// <summary>
+        /// 尝试获取当前任务的文件名
+        /// </summary>
+        protected async void GetFileInfo()
+        {
+            JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
+            if (x.Result.Count == 1)
+            {
+                string filepath = x.Result[0].path;
+                if (filepath != null)
+                {
+                    FileName = filepath.Substring(filepath.LastIndexOf(@"/") + 1);
+                    FileNameSource = FileNameSources.Path;
+                }
+                else
+                {
+                    string uri = x.Result[0].uris[0].uri;
+                    FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
+                    FileNameSource = FileNameSources.Uri;
+                }
+            }
+            else
+            {
+                string path = x.Result[0].path;
+                int count = x.Result.Count;
+                FileName = path.Substring(path.IndexOf(@"/") + 1, path.LastIndexOf(@"/")) + "，共计" + count.ToString() + "个文件";
+            }
+            OnPropertyChanged("FileName");
+        }
 
         public delegate void TaskFinish(TaskLite e);
 
@@ -33,7 +159,7 @@ namespace ezAria2
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public virtual void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -46,22 +172,12 @@ namespace ezAria2
             Ed2k
         }
 
-        private enum FileNameSources
-        {
-            Path,
-            Uri
-        }
-
-        private FileNameSources FileNameSource;
-
+        /// <summary>
+        /// 指示该任务的来源，可能是URL，可能是BT或MetaLink
+        /// </summary>
         public TaskType Type { get; set; }
 
         public string State { get; set; }//任务的状态
-
-        /// <summary>
-        /// aria2c返回的任务状态，包含更多信息
-        /// </summary>
-        private string Status;
 
         /// <summary>
         /// 下载文件的图标
@@ -106,34 +222,11 @@ namespace ezAria2
 
         public string Gid { get; set; }//任务的GID
 
-        public async void GetFileInfo()//获得文件信息
-        {
-            JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
-            if (x.Result.Count == 1)
-            {
-                string filepath = x.Result[0].path;
-                if(filepath != null)
-                {
-                    FileName = filepath.Substring(filepath.LastIndexOf(@"/") + 1);
-                    FileNameSource = FileNameSources.Path;
-                }
-                else
-                {
-                    string uri = x.Result[0].uris[0].uri;
-                    FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
-                    FileNameSource = FileNameSources.Uri;
-                }
-            }
-            else
-            {
-                string path = x.Result[0].path;
-                int count = x.Result.Count;
-                FileName = path.Substring(path.IndexOf(@"/") + 1, path.LastIndexOf(@"/")) + "，共计" + count.ToString() + "个文件";
-            }
-            OnPropertyChanged("FileName");
-        }
-
-        public async Task Refresh()//刷新任务状态
+        /// <summary>
+        /// 刷新任务状态
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task RefreshAsync()
         {
             if (OughtToRefresh <= 0)
             {
@@ -146,101 +239,42 @@ namespace ezAria2
             }
         }
 
+        /// <summary>
+        /// 这个方法用于暂停和开始任务，已知问题：如果一个磁力任务当前没有速度，则无法正确暂停
+        /// </summary>
         public async void StateChangeFunction()
         {
-            if (State == "none")
+            if (Status == "active")
             {
                 await Aria2Methords.Pause(Gid);
-                State = "error";
+                //State = "error";
             }
             else
             {
                 await Aria2Methords.UpPause(Gid);
-                State = "none";
+                //State = "none";
             }
             OughtToRefresh = 0;
             OnPropertyChanged("State");
         }
 
+        /// <summary>
+        /// 移除当前任务
+        /// </summary>
+        /// <returns></returns>
         public async Task Remove()
         {
             await Aria2Methords.Remove(Gid);
         }
 
-        private void InformationRefresh(JRCtler.JsonRpcRes e)
-        {
-            //计算当前下载速度
-            double SpeedLong = e.Result.downloadSpeed;
-            if (SpeedLong / 1024 == 0)
-                Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
-            else if (SpeedLong / 1048576 == 0)
-                Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
-            else
-                Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
-            OnPropertyChanged("Speed");
-
-            //更新状态
-            string NewStatus = e.Result.status;
-            if (Status!=NewStatus)
-            {
-                Status = NewStatus;
-                switch (Status)
-                {
-                    case "active":
-                        State = "none";
-                        break;
-                    case "waiting":
-                        State = "wait";
-                        OughtToRefresh = 5;
-                        break;
-                    case "paused":
-                        State = "wait";
-                        OughtToRefresh = 5;
-                        break;
-                    case "error":
-                        State = "error";
-                        OughtToRefresh = 10;
-                        break;
-                    case "complete":
-                        State = "none";
-                        TaskFinished?.Invoke(this);
-                        OughtToRefresh = 10;
-                        break;
-                    case "removed":
-                        State = "error";
-                        OughtToRefresh = 10;
-                        break;
-                    default:
-                        State = "wait";
-                        OughtToRefresh = 5;
-                        break;
-                }
-                OnPropertyChanged("State");
-            }
-
-            //更新进度
-            string CompletedNew = e.Result.completedLength;
-            Total = e.Result.totalLength;
-            if (CompletedNew != Completed)
-            {
-                Completed = CompletedNew;
-                OnPropertyChanged("Progress");
-            }
-            else if (CompletedNew=="0")
-            {
-                State = "wait";
-                OnPropertyChanged("State");
-            }
-
-            Gid = e.Result.gid;
-            if (FileName==null||FileNameSource != FileNameSources.Path)
-                GetFileInfo();
-            e = null;
-        }
-
         public TaskLite(JRCtler.JsonRpcRes e)//构造函数
         {
             InformationRefresh(e);
+        }
+
+        public TaskLite()
+        {
+
         }
     }
 
@@ -301,7 +335,7 @@ namespace ezAria2
             for (int i = 0; i < Count; i++)
             {
                 this[i].TaskFinished += RemoveTask;
-                await this[i].Refresh();
+                await this[i].RefreshAsync();
                 this[i].TaskFinished -= RemoveTask;
             }
             while (FinishedTaskList.Count != 0)
@@ -309,6 +343,32 @@ namespace ezAria2
                 Remove(FinishedTaskList.Dequeue());//直接在for或foreach循环中进行remove操作会导致异常
             }
             Refresh();
+        }
+    }
+
+    /// <summary>
+    /// 一个完整版本的任务信息
+    /// </summary>
+    public class TaskInformation : TaskLite
+    {
+        protected override void InformationRefresh(JRCtler.JsonRpcRes e)
+        {
+            base.InformationRefresh(e);
+        }
+
+        public override async Task RefreshAsync()
+        {
+            JRCtler.JsonRpcRes e = await Aria2Methords.TellStatus(Gid);
+            InformationRefresh(e);
+        }
+
+        public string[] FilesList { get; set; }
+
+        public string[] Peers { get; set; }
+
+        public TaskInformation(TaskLite e)
+        {
+            Gid = e.Gid;
         }
     }
 
@@ -342,7 +402,34 @@ namespace ezAria2
 
         public string Path { get; set; }//文件路径
 
-        public string FileSize { get; set; }//文件尺寸
+        private string filesize;
+        public string FileSize //文件尺寸
+        {
+            get
+            {
+                return filesize;
+            }
+            set
+            {
+                double FileSizeValue = double.Parse(value);
+                if (FileSizeValue < 1024)
+                {
+                    filesize = Math.Round(FileSizeValue,2).ToString() + "B";
+                }
+                else if (FileSizeValue < 1024 * 1024)
+                {
+                    filesize = Math.Round((FileSizeValue / 1024),2).ToString() + "KB";
+                }
+                else if (FileSizeValue < (1024 ^ 3))
+                {
+                    filesize = Math.Round((FileSizeValue / 1024 / 1024),2).ToString() + "MB";
+                }
+                else
+                {
+                    filesize = Math.Round((FileSizeValue / (1024 ^ 3)),2).ToString() + "GB";
+                }
+            }
+        }
 
         public string FromGid { get; set; }//指示该下载文件来自哪个GID
     }
@@ -434,6 +521,21 @@ namespace ezAria2
             Stc.dispatcherTimer.Tick += new EventHandler(Save);
         }
     }
+
+    //public class Commander : ICommand
+    //{
+    //    public event EventHandler CanExecuteChanged;
+
+    //    public bool CanExecute(object parameter)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public void Execute(object parameter)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 
     /// <summary>
     /// JsonRpc控制器，基于WebSocket

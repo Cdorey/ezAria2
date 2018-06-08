@@ -11,8 +11,8 @@
         <Metro:MetroTitleMenu>
             <Metro:MetroTitleMenuItem Header="退出" Click="MetroTitleMenuItem_Click"/>
             <Metro:MetroTitleMenuItem Header="测试"/>
-            <Metro:MetroTitleMenuItem Name="SettingButtom" Header="设置" Click="SettingButton_Click"/>
-            <Metro:MetroTitleMenuItem Header="关于"/>
+            <Metro:MetroTitleMenuItem Name="SettingButton" Header="设置" Click="SettingButton_Click"/>
+            <Metro:MetroTitleMenuItem Header="关于" Name="AboutButton" Click="AboutButton_Click"/>
         </Metro:MetroTitleMenu>
     </Metro:MetroWindow.Menu>
     <!--<Metro:MetroWindow.ContextMenu>

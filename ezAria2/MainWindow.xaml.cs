@@ -90,5 +90,10 @@ namespace ezAria2
             Task.Show();
         }
 
+        private void AboutButton_Click(object sender, RoutedEventArgs e)
+        {
+            About about = new About();
+            about.Show();
+        }
     }
 }

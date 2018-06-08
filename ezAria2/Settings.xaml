@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ezAria2"
         xmlns:Metro="clr-namespace:Arthas.Controls.Metro;assembly=Arthas"
         mc:Ignorable="d"
-        Title="设置" Height="450" Width="600" MinWidth="600" MinHeight="450" BorderBrush="#FF146099" Icon="Resources/gear-1077550_640.png" WindowStyle="None" >
+        Title="设置" Height="450" Width="600" MinWidth="600" MinHeight="450" BorderBrush="#FF146099" Icon="Resources/gear-1077550_640.png" ResizeMode="CanMinimize" >
     <Window.Resources>
         <Style TargetType="Metro:MetroTextBlock">
             <Setter Property="Margin"  Value="10,0"/>

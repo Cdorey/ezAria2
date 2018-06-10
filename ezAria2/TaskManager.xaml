@@ -9,5 +9,37 @@
         x:Class="ezAria2.TaskManager"
         mc:Ignorable="d"
         Title="TaskManager" Height="600" Width="800">
-    <Grid/>
+    <StackPanel Orientation="Horizontal">
+        <!--<Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>-->
+        <Metro:MetroScrollViewer>
+            <Border BorderBrush="#19000000" BorderThickness="0,0,1,0" Width="200">
+                <StackPanel x:Name="lists">
+                    <Metro:MetroExpander Header="基本信息" Hint="提示"  />
+                    <Metro:MetroExpander Header="Button" Hint="1 / 100" />
+                    <Metro:MetroExpander Header="连接(Peers)" IsExpanded="True" Hint="可以修改" HintBackground="#FFF15151">
+                        <StackPanel>
+                            <Metro:MetroExpander Header="Button" />
+                            <Metro:MetroExpander Header="Button" />
+                            <Metro:MetroExpander Header="Button" />
+                            <Metro:MetroExpander Header="Button" />
+                            <Metro:MetroExpander Header="Button" />
+                        </StackPanel>
+                    </Metro:MetroExpander>
+                    <Metro:MetroExpander Header="Header" IsExpanded="True">
+                        <StackPanel>
+                            <Metro:MetroExpander Header="子内容长标题测试" Hint="1 / 100" />
+                            <Metro:MetroExpander Header="Button">
+                            </Metro:MetroExpander>
+                            <Metro:MetroExpander Header="Button" />
+                            <Metro:MetroExpander Header="Button" />
+                        </StackPanel>
+                    </Metro:MetroExpander>
+                </StackPanel>
+            </Border>
+        </Metro:MetroScrollViewer>
+        <Grid Width="200"/>
+    </StackPanel>
 </Metro:MetroWindow>

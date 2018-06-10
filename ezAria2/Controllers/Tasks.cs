@@ -15,19 +15,9 @@ using WebSocketSharp;
 
 namespace ezAria2
 {
-    /// <summary>
-    /// 小型任务对象,用于任务列表
-    /// </summary>
-    public class TaskLite : INotifyPropertyChanged
+    public class Aria2cTask:INotifyPropertyChanged
     {
-        protected string Completed;//已完成的尺寸
-
-        protected string Total;//任务的尺寸
-
-        /// <summary>
-        /// aria2c返回的任务状态，包含更多信息
-        /// </summary>
-        protected string Status;
+        public string Gid { get; set; }//任务的GID
 
         /// <summary>
         /// 枚举文件名的来源
@@ -43,10 +33,127 @@ namespace ezAria2
         /// </summary>
         protected FileNameSources FileNameSource;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public enum TaskType
+        {
+            Http,
+            BitTorrent,
+            MetaLink,
+            Ed2k
+        }
+
+        /// <summary>
+        /// 指示该任务的来源，可能是URL，可能是BT或MetaLink
+        /// </summary>
+        public TaskType Type { get; set; }
+
+        public string FileName { get; set; }//下载的文件名
+
+        /// <summary>
+        /// 尝试获取当前任务的文件名
+        /// </summary>
+        protected async void GetFileInfo()
+        {
+            JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
+            if (x.Result.Count == 1)
+            {
+                string filepath = x.Result[0].path;
+                if (filepath != null)
+                {
+                    FileName = filepath.Substring(filepath.LastIndexOf(@"/") + 1);
+                    FileNameSource = FileNameSources.Path;
+                }
+                else
+                {
+                    string uri = x.Result[0].uris[0].uri;
+                    FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
+                    FileNameSource = FileNameSources.Uri;
+                }
+            }
+            else
+            {
+                string path = x.Result[0].path;
+                int count = x.Result.Count;
+                FileName = path.Substring(path.IndexOf(@"/") + 1, path.LastIndexOf(@"/")) + "，共计" + count.ToString() + "个文件";
+            }
+            OnPropertyChanged("FileName");
+        }
+
+        public Aria2cTask()
+        {
+
+        }
+    }
+
+    /// <summary>
+    /// 小型任务对象,用于任务列表
+    /// </summary>
+    public class TaskLite : Aria2cTask
+    {
+        protected string Completed;//已完成的尺寸
+
+        protected string Total;//任务的尺寸
+
+        /// <summary>
+        /// aria2c返回的任务状态，包含更多信息
+        /// </summary>
+        protected string Status;
+
         /// <summary>
         /// 归零时刷新
         /// </summary>
         protected int OughtToRefresh = 0;
+
+        public delegate void TaskFinish(TaskLite e);
+
+        public event TaskFinish TaskFinished;//当前任务的status变成completed时触发
+
+        public string State { get; set; }//任务的状态
+
+        /// <summary>
+        /// 下载文件的图标
+        /// </summary>
+        public string Icon
+        {
+            get
+            {
+                switch (Type)
+                {
+                    case TaskType.Http:
+                        return "Resources/Icon70/Download.png";
+                    case TaskType.BitTorrent:
+                        return "Resources/Icon70/bt.png";
+                    case TaskType.MetaLink:
+                        return "Resources/Icon70/link.png";
+                    default:
+                        return "Resources/Icon70/web.png";
+                }
+            }
+        }
+
+        public string Speed { get; set; }//当前速度
+
+        public double Progress
+        {
+            get
+            {
+                if (long.Parse(Total) == 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    double i = long.Parse(Completed) * 100 / long.Parse(Total);
+                    return i;
+                }
+            }
+        }
 
         /// <summary>
         /// 解析一个RPC调用结果以更新当前任务
@@ -124,105 +231,6 @@ namespace ezAria2
         }
 
         /// <summary>
-        /// 尝试获取当前任务的文件名
-        /// </summary>
-        protected async void GetFileInfo()
-        {
-            JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
-            if (x.Result.Count == 1)
-            {
-                string filepath = x.Result[0].path;
-                if (filepath != null)
-                {
-                    FileName = filepath.Substring(filepath.LastIndexOf(@"/") + 1);
-                    FileNameSource = FileNameSources.Path;
-                }
-                else
-                {
-                    string uri = x.Result[0].uris[0].uri;
-                    FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
-                    FileNameSource = FileNameSources.Uri;
-                }
-            }
-            else
-            {
-                string path = x.Result[0].path;
-                int count = x.Result.Count;
-                FileName = path.Substring(path.IndexOf(@"/") + 1, path.LastIndexOf(@"/")) + "，共计" + count.ToString() + "个文件";
-            }
-            OnPropertyChanged("FileName");
-        }
-
-        public delegate void TaskFinish(TaskLite e);
-
-        public event TaskFinish TaskFinished;//当前任务的status变成completed时触发
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public enum TaskType
-        {
-            Http,
-            BitTorrent,
-            MetaLink,
-            Ed2k
-        }
-
-        /// <summary>
-        /// 指示该任务的来源，可能是URL，可能是BT或MetaLink
-        /// </summary>
-        public TaskType Type { get; set; }
-
-        public string State { get; set; }//任务的状态
-
-        /// <summary>
-        /// 下载文件的图标
-        /// </summary>
-        public string Icon
-        {
-            get
-            {
-                switch (Type)
-                {
-                    case TaskType.Http:
-                        return "Resources/Icon70/Download.png";
-                    case TaskType.BitTorrent:
-                        return "Resources/Icon70/bt.png";
-                    case TaskType.MetaLink:
-                        return "Resources/Icon70/link.png";
-                    default:
-                        return "Resources/Icon70/web.png";
-                }
-            }
-        }
-
-        public string Speed { get; set; }//当前速度
-
-        public double Progress
-        {
-            get
-            {
-                if (long.Parse(Total) == 0)
-                {
-                    return 0;
-                }
-                else
-                {
-                    double i = long.Parse(Completed) * 100 / long.Parse(Total);
-                    return i;
-                }
-            }
-        }
-
-        public string FileName { get; set; }//下载的文件名
-
-        public string Gid { get; set; }//任务的GID
-
-        /// <summary>
         /// 刷新任务状态
         /// </summary>
         /// <returns></returns>
@@ -278,7 +286,7 @@ namespace ezAria2
         }
     }
 
-    public class TaskList : ObservableCollection<TaskLite>//任务列表
+    public sealed class TaskList : ObservableCollection<TaskLite>//任务列表
     {
         public delegate void TaskFinish(TaskLite e);
 
@@ -372,18 +380,8 @@ namespace ezAria2
         }
     }
 
-    public class FinishedTask//已完成任务
+    public class FinishedTask:Aria2cTask//已完成任务
     {
-
-        public BitmapImage FileIcon
-        {
-            get
-            {
-                Bitmap picture = Icon.ExtractAssociatedIcon(Path).ToBitmap();
-                picture.MakeTransparent(picture.GetPixel(1, 1));
-                return BitmapToBitmapImage(picture);
-            }
-        }
 
         private BitmapImage BitmapToBitmapImage(Bitmap bitmap)
         {
@@ -398,7 +396,15 @@ namespace ezAria2
             return image;
         }
 
-        public string FileName { get; set; }//下载的文件名
+        public BitmapImage FileIcon
+        {
+            get
+            {
+                Bitmap picture = Icon.ExtractAssociatedIcon(Path).ToBitmap();
+                picture.MakeTransparent(picture.GetPixel(1, 1));
+                return BitmapToBitmapImage(picture);
+            }
+        }
 
         public string Path { get; set; }//文件路径
 
@@ -430,11 +436,9 @@ namespace ezAria2
                 }
             }
         }
-
-        public string FromGid { get; set; }//指示该下载文件来自哪个GID
     }
 
-    public class HistoryList : ObservableCollection<FinishedTask>//历史任务列表
+    public sealed class HistoryList : ObservableCollection<FinishedTask>//历史任务列表
     {
         /// <summary>
         /// 归零时保存
@@ -504,7 +508,7 @@ namespace ezAria2
                     {
                         Path = x.path,
                         FileSize = x.length,
-                        FromGid = e.Gid
+                        Gid = e.Gid
                     };
                     a.FileName = a.Path.Substring(a.Path.LastIndexOf(@"/") + 1);
                     Add(a);

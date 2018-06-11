@@ -35,3 +35,4 @@
 * [Arthas的WPF开源控件类库](https://github.com/1217950746/Arthas-WPFUI)MIT许可
 * [Websocket-Sharp](https://github.com/sta/websocket-sharp)MIT许可
 * [KnownFolders](https://github.com/Syroot/KnownFolders)MIT许可
+* [DMSkin.WPF控件库](https://github.com/944095635/DMSkin-for-WPF)MIT许可

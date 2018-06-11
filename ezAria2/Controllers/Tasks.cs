@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using WebSocketSharp;
 
 namespace ezAria2
@@ -288,6 +289,8 @@ namespace ezAria2
 
     public sealed class TaskList : ObservableCollection<TaskLite>//任务列表
     {
+        private DispatcherTimer dispatcherTimer = new DispatcherTimer();
+
         public delegate void TaskFinish(TaskLite e);
 
         public event TaskFinish TaskFinished;//有任务状态为completed时触发
@@ -351,6 +354,21 @@ namespace ezAria2
                 Remove(FinishedTaskList.Dequeue());//直接在for或foreach循环中进行remove操作会导致异常
             }
             Refresh();
+        }
+
+        /// <summary>
+        /// 获得一个当前任务列表对象的拷贝
+        /// </summary>
+        /// <returns></returns>
+        public TaskList Clone()
+        {
+            return (TaskList)MemberwiseClone();
+        }
+
+        public TaskList()
+        {
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
         }
     }
 

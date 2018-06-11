@@ -25,6 +25,8 @@
             <!--圆按钮-->
             <!--按钮字体颜色-->
             <Setter Property="Foreground" Value="Black"/>
+            <!--隐藏虚线边框-->
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <!--修改模板属性-->
             <Setter Property="Template">
                 <Setter.Value>

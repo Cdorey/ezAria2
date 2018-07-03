@@ -29,6 +29,7 @@
 1. 使用GUI实现aria2的所有命令
 2. 完成对aria2 Notice的解析
 3. 自动转换来自其他下载工具的专用链接，如果支持则自动下载
+
 ## 许可和引用
 
 * 依照GPL V2许可发布
@@ -36,3 +37,4 @@
 * [Websocket-Sharp](https://github.com/sta/websocket-sharp)MIT许可
 * [KnownFolders](https://github.com/Syroot/KnownFolders)MIT许可
 * [DMSkin.WPF控件库](https://github.com/944095635/DMSkin-for-WPF)MIT许可
+* [Notifications土司通知](https://github.com/Federerer/Notifications.Wpf)MIT许可

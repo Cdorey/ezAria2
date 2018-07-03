@@ -12,6 +12,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using DMSkin;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace ezAria2
 {
@@ -20,14 +23,28 @@ namespace ezAria2
     /// </summary>
     public partial class TaskManager : MetroWindow
     {
+        //private TaskInformation TaskInformation;
+        private Test TestObj = new Test();
         public TaskManager()
         {
             InitializeComponent();
+            //TaskInformation = new TaskInformation("helloworld");
+            //DataContext = TaskInformation;
+            DataContext = TestObj;
         }
 
-        private void MetroButton_Click(object sender, RoutedEventArgs e)
+        class Test
         {
-        
+            public SeriesCollection SpeedLine { get;set;}
+            public Test()
+            {
+                SpeedLine = new SeriesCollection();
+                ChartValues<int> LineValues = new ChartValues<int> { 1, 2, 3, 4 };
+                SpeedLine.Add(new LineSeries
+                {
+                    Values = LineValues
+                });
+            }
         }
     }
 }

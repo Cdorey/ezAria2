@@ -396,6 +396,11 @@ namespace ezAria2
         {
             Gid = e.Gid;
         }
+
+        public TaskInformation(string e)
+        {
+            Gid = e;
+        }
     }
 
     public class FinishedTask:Aria2cTask//已完成任务
@@ -444,13 +449,13 @@ namespace ezAria2
                 {
                     filesize = Math.Round((FileSizeValue / 1024),2).ToString() + "KB";
                 }
-                else if (FileSizeValue < (1024 ^ 3))
+                else if (FileSizeValue < (1024 * 1024 * 1024))
                 {
                     filesize = Math.Round((FileSizeValue / 1024 / 1024),2).ToString() + "MB";
                 }
                 else
                 {
-                    filesize = Math.Round((FileSizeValue / (1024 ^ 3)),2).ToString() + "GB";
+                    filesize = Math.Round((FileSizeValue / (1024 * 1024 * 1024)),2).ToString() + "GB";
                 }
             }
         }

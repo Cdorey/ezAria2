@@ -95,5 +95,11 @@ namespace ezAria2
             About about = new About();
             about.Show();
         }
+
+        private void Test_Click(object sender, RoutedEventArgs e)
+        {
+            TaskManager TaskManager = new TaskManager();
+            TaskManager.Show();
+        }
     }
 }

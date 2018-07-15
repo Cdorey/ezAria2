@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Wpf;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -710,6 +713,164 @@ namespace ezAria2
         }
 
     }
+
+    /// <summary>
+    /// 一个速度曲线图
+    /// </summary>
+    public class SpeedChart
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// 一系列线的集合，绑定Chart的Series属性；
+        /// </summary>
+        public SeriesCollection Lines { get; set; }
+
+        public Axis DateTimeAxis { get; set; }
+
+        public Axis SpeedAxis { get; set; }
+
+        /// <summary>
+        /// SpeedLine上的点数据
+        /// </summary>
+        public class SpeedLinePoint
+        {
+            public DateTime DateTime { get; set; }
+            public long Value { get; set; }
+        }
+
+        /// <summary>
+        /// SpeedLine的值
+        /// </summary>
+        public ChartValues<SpeedLinePoint> SpeedValues { get; set; }
+
+        /// <summary>
+        /// 速度曲线
+        /// </summary>
+        public LineSeries SpeedLine { get; set; }
+
+        /// <summary>
+        /// X轴 时间
+        /// </summary>
+        public Func<double, string> DateTimeFormatter { get; set; }
+
+        private void NewDateTimeFormatter()
+        {
+            DateTimeFormatter = value =>
+            {
+                return new DateTime((long)value).ToString("hh:mm:ss");
+            };
+        }
+
+        private long XAxisLength = 60;//时间轴长度，默认60（秒）
+
+        /// <summary>
+        /// X轴最大值
+        /// </summary>
+        public long AxisMax
+        {
+            get { return _axisMax; }
+            set
+            {
+                _axisMax = value;
+                OnPropertyChanged("AxisMax");
+            }
+        }
+        private long _axisMax;
+
+        /// <summary>
+        /// X轴最小值
+        /// </summary>
+        public long AxisMin
+        {
+            get { return _axisMin; }
+            set
+            {
+                _axisMin = value;
+                OnPropertyChanged("AxisMin");
+            }
+        }
+        private long _axisMin;
+
+        /// <summary>
+        /// 创建时间轴
+        /// </summary>
+        /// <param name="now">以该时刻作为终点</param>
+        private void SetAxisLimits(DateTime now)
+        {
+            AxisMax = (now.Ticks + TimeSpan.FromSeconds(1).Ticks);
+            AxisMin = (now.Ticks - TimeSpan.FromSeconds(XAxisLength).Ticks);
+        }
+
+        /// <summary>
+        /// 创建时间轴
+        /// </summary>
+        /// <param name="behind">时间轴长度</param>
+        private void SetAxisLimits(long behind)
+        {
+            DateTime Now = DateTime.Now;
+            XAxisLength = behind;
+            AxisMax = (Now.Ticks + TimeSpan.FromSeconds(1).Ticks);
+            AxisMin = (Now.Ticks - TimeSpan.FromSeconds(XAxisLength).Ticks);
+        }
+
+        /// <summary>
+        /// Y轴 速度
+        /// </summary>
+        public Func<long, string> SpeedDataFormatter { get; set; }
+
+        //public int AxisStep { get; set; }
+
+        //public int AxisUnit { get; set; }
+
+        /// <summary>
+        /// 增加一个点
+        /// </summary>
+        /// <param name="Speed">当前速度</param>
+        public void Add(long Speed)
+        {
+            var Now = DateTime.Now;
+            SpeedValues.Add(new SpeedLinePoint
+            {
+                DateTime = Now,
+                Value = Speed
+            });
+
+            SetAxisLimits(Now);
+
+            //超出点数后移除最初的
+            if (SpeedValues.Count > XAxisLength) SpeedValues.RemoveAt(0);
+        }
+
+        public SpeedChart()
+        {
+            SpeedValues = new ChartValues<SpeedLinePoint>();
+            NewDateTimeFormatter();
+
+            var mapper = Mappers.Xy<SpeedLinePoint>()
+                .X(model => model.DateTime.Ticks)   //use DateTime.Ticks as X
+                .Y(model => model.Value);           //use the value property as Y
+
+            //lets save the mapper globally.
+            Charting.For<SpeedLinePoint>(mapper);
+            SpeedLine = new LineSeries
+            {
+                Values = SpeedValues
+            };
+            Lines = new SeriesCollection
+            {
+                SpeedLine
+            };
+
+        }
+    }
+
 
     /// <summary>
     /// Aria2 Rpc接口的方法库

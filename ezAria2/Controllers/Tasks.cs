@@ -19,7 +19,7 @@ using WebSocketSharp;
 
 namespace ezAria2
 {
-    public class Aria2cTask:INotifyPropertyChanged
+    public class Aria2cTask : INotifyPropertyChanged
     {
         public string Gid { get; set; }//任务的GID
 
@@ -57,7 +57,10 @@ namespace ezAria2
         /// </summary>
         public TaskType Type { get; set; }
 
-        public string FileName { get; set; }//下载的文件名
+        /// <summary>
+        /// 文件名
+        /// </summary>
+        public string FileName { get; set; }
 
         /// <summary>
         /// 尝试获取当前任务的文件名
@@ -141,7 +144,10 @@ namespace ezAria2
             }
         }
 
-        public string Speed { get; set; }//当前速度
+        /// <summary>
+        /// 当前速度
+        /// </summary>
+        public string Speed { get; set; }
 
         public double Progress
         {
@@ -161,6 +167,11 @@ namespace ezAria2
 
         /// <summary>
         /// 解析一个RPC调用结果以更新当前任务
+        /// downloadSpeed
+        /// status
+        /// completedLength
+        /// totalLength
+        /// gid
         /// </summary>
         /// <param name="e"></param>
         protected virtual void InformationRefresh(JRCtler.JsonRpcRes e)
@@ -251,6 +262,11 @@ namespace ezAria2
             }
         }
 
+        private async void Refresh()
+        {
+            await RefreshAsync();
+        }
+
         /// <summary>
         /// 这个方法用于暂停和开始任务，已知问题：如果一个磁力任务当前没有速度，则无法正确暂停
         /// </summary>
@@ -279,9 +295,23 @@ namespace ezAria2
             await Aria2Methords.Remove(Gid);
         }
 
-        public TaskLite(JRCtler.JsonRpcRes e)//构造函数
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="e">使用该Json Rpc请求结果初始化任务对象</param>
+        public TaskLite(JRCtler.JsonRpcRes e)
         {
             InformationRefresh(e);
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="gid">使用该Gid初始化任务对象并拉取状态</param>
+        public TaskLite(string gid)
+        {
+            Gid = gid;
+            Refresh();
         }
 
         public TaskLite()
@@ -395,6 +425,24 @@ namespace ezAria2
 
         public string[] Peers { get; set; }
 
+        /// <summary>
+        /// 获取速度信息
+        /// </summary>
+        /// <returns>x[0]下载速度，x[1]上传速度</returns>
+        public async Task<long[]> GetSpeed()
+        {
+            JRCtler.JsonRpcRes x = await Aria2Methords.TellStatus(Gid, new string[2]
+            {
+                "downloadSpeed",
+                "uploadSpeed"
+            });
+            return new long[]
+            {
+                x.Result.downloadSpeed,
+                x.Result.uploadSpeed
+            };
+        }
+
         public TaskInformation(TaskLite e)
         {
             Gid = e.Gid;
@@ -406,7 +454,7 @@ namespace ezAria2
         }
     }
 
-    public class FinishedTask:Aria2cTask//已完成任务
+    public class FinishedTask : Aria2cTask//已完成任务
     {
 
         private BitmapImage BitmapToBitmapImage(Bitmap bitmap)
@@ -446,19 +494,19 @@ namespace ezAria2
                 double FileSizeValue = double.Parse(value);
                 if (FileSizeValue < 1024)
                 {
-                    filesize = Math.Round(FileSizeValue,2).ToString() + "B";
+                    filesize = Math.Round(FileSizeValue, 2).ToString() + "B";
                 }
                 else if (FileSizeValue < 1024 * 1024)
                 {
-                    filesize = Math.Round((FileSizeValue / 1024),2).ToString() + "KB";
+                    filesize = Math.Round((FileSizeValue / 1024), 2).ToString() + "KB";
                 }
                 else if (FileSizeValue < (1024 * 1024 * 1024))
                 {
-                    filesize = Math.Round((FileSizeValue / 1024 / 1024),2).ToString() + "MB";
+                    filesize = Math.Round((FileSizeValue / 1024 / 1024), 2).ToString() + "MB";
                 }
                 else
                 {
-                    filesize = Math.Round((FileSizeValue / (1024 * 1024 * 1024)),2).ToString() + "GB";
+                    filesize = Math.Round((FileSizeValue / (1024 * 1024 * 1024)), 2).ToString() + "GB";
                 }
             }
         }
@@ -548,7 +596,7 @@ namespace ezAria2
         {
             Load();
             //CollectionChanged += Save;
-            Stc.dispatcherTimer.Tick += new EventHandler(Save);
+            //dispatcherTimer.Tick += new EventHandler(Save);
         }
     }
 
@@ -721,10 +769,9 @@ namespace ezAria2
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName = null)
+        public virtual void OnPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>
@@ -741,34 +788,48 @@ namespace ezAria2
         /// </summary>
         public class SpeedLinePoint
         {
-            public DateTime DateTime { get; set; }
+            public long DateTime { get; set; }
             public long Value { get; set; }
         }
 
         /// <summary>
         /// SpeedLine的值
         /// </summary>
-        public ChartValues<SpeedLinePoint> SpeedValues { get; set; }
+        public ChartValues<SpeedLinePoint> DownloadSpeedValues { get; set; }
 
         /// <summary>
         /// 速度曲线
         /// </summary>
-        public LineSeries SpeedLine { get; set; }
+        public LineSeries DownloadSpeedLine { get; set; }
+
+        /// <summary>
+        /// SpeedLine的值
+        /// </summary>
+        public ChartValues<SpeedLinePoint> UploadSpeedValues { get; set; }
+
+        /// <summary>
+        /// 速度曲线
+        /// </summary>
+        public LineSeries UploadSpeedLine { get; set; }
 
         /// <summary>
         /// X轴 时间
         /// </summary>
         public Func<double, string> DateTimeFormatter { get; set; }
 
-        private void NewDateTimeFormatter()
+        private void NewFormatter()
         {
             DateTimeFormatter = value =>
             {
                 return new DateTime((long)value).ToString("hh:mm:ss");
             };
+            SpeedDataFormatter = value =>
+             {
+                 return value.ToString();
+             };
         }
 
-        private long XAxisLength = 60;//时间轴长度，默认60（秒）
+        private long XAxisLength;//时间轴长度，默认60（秒）
 
         /// <summary>
         /// X轴最大值
@@ -805,19 +866,7 @@ namespace ezAria2
         private void SetAxisLimits(DateTime now)
         {
             AxisMax = (now.Ticks + TimeSpan.FromSeconds(1).Ticks);
-            AxisMin = (now.Ticks - TimeSpan.FromSeconds(XAxisLength).Ticks);
-        }
-
-        /// <summary>
-        /// 创建时间轴
-        /// </summary>
-        /// <param name="behind">时间轴长度</param>
-        private void SetAxisLimits(long behind)
-        {
-            DateTime Now = DateTime.Now;
-            XAxisLength = behind;
-            AxisMax = (Now.Ticks + TimeSpan.FromSeconds(1).Ticks);
-            AxisMin = (Now.Ticks - TimeSpan.FromSeconds(XAxisLength).Ticks);
+            AxisMin = (now.Ticks - TimeSpan.FromSeconds(XAxisLength-1).Ticks);
         }
 
         /// <summary>
@@ -833,39 +882,60 @@ namespace ezAria2
         /// 增加一个点
         /// </summary>
         /// <param name="Speed">当前速度</param>
-        public void Add(long Speed)
+        public void Add(long[] Speed)
         {
             var Now = DateTime.Now;
-            SpeedValues.Add(new SpeedLinePoint
+            DownloadSpeedValues.Add(new SpeedLinePoint
             {
-                DateTime = Now,
-                Value = Speed
+                DateTime = Now.Ticks,
+                Value = Speed[0]
+            });
+
+            UploadSpeedValues.Add(new SpeedLinePoint
+            {
+                DateTime = Now.Ticks,
+                Value = Speed[1]
             });
 
             SetAxisLimits(Now);
 
             //超出点数后移除最初的
-            if (SpeedValues.Count > XAxisLength) SpeedValues.RemoveAt(0);
+            if (DownloadSpeedValues.Count > XAxisLength) DownloadSpeedValues.RemoveAt(0);
+            if (UploadSpeedValues.Count > XAxisLength) UploadSpeedValues.RemoveAt(0);
         }
 
         public SpeedChart()
         {
-            SpeedValues = new ChartValues<SpeedLinePoint>();
-            NewDateTimeFormatter();
+            //SpeedLinePoint a = new SpeedLinePoint
+            //{
+            //    DateTime = DateTime.Now,
+            //    Value = 0
+            //};
+            //SpeedLinePoint[] b = new SpeedLinePoint[50];
+            DownloadSpeedValues = new ChartValues<SpeedLinePoint>();
+            UploadSpeedValues = new ChartValues<SpeedLinePoint>();
 
+            NewFormatter();
             var mapper = Mappers.Xy<SpeedLinePoint>()
-                .X(model => model.DateTime.Ticks)   //use DateTime.Ticks as X
+                .X(model => model.DateTime)   //use DateTime.Ticks as X
                 .Y(model => model.Value);           //use the value property as Y
 
             //lets save the mapper globally.
             Charting.For<SpeedLinePoint>(mapper);
-            SpeedLine = new LineSeries
+            XAxisLength = 60;
+            SetAxisLimits(DateTime.Now);
+            DownloadSpeedLine = new LineSeries
             {
-                Values = SpeedValues
+                Values = DownloadSpeedValues
+            };
+            UploadSpeedLine = new LineSeries
+            {
+                Values = UploadSpeedValues
             };
             Lines = new SeriesCollection
             {
-                SpeedLine
+                DownloadSpeedLine,
+                //UploadSpeedLine
             };
 
         }

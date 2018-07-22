@@ -1,6 +1,7 @@
 ﻿using Arthas.Controls.Metro;
 using System;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace ezAria2
 {
@@ -9,6 +10,12 @@ namespace ezAria2
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        private bool TaskDataChanging = false;
+
+        private bool HistoryDataChanging = false;
+
+        private DispatcherTimer dispatcherTimer = new DispatcherTimer();
+
         /// <summary>
         /// 正在进行的任务列表
         /// </summary>
@@ -21,7 +28,9 @@ namespace ezAria2
         public MainWindow()
         {
             InitializeComponent();
-            Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
+            dispatcherTimer.Tick += new EventHandler(ListRefresh);
             TaskData.TaskFinished += HistoryData.TaskCompleted;
             TasksInProgress.ItemsSource = TaskData;
             FinishedList.ItemsSource = HistoryData;
@@ -37,14 +46,14 @@ namespace ezAria2
 
         private async void ListRefresh(object sender, EventArgs e)
         {
-            Stc.dispatcherTimer.Tick -= new EventHandler(ListRefresh);
+            dispatcherTimer.Tick -= new EventHandler(ListRefresh);
             try
             {
                 await TaskData.Update();
             }
             finally
             {
-                Stc.dispatcherTimer.Tick += new EventHandler(ListRefresh);
+                dispatcherTimer.Tick += new EventHandler(ListRefresh);
             }
         }
 
@@ -98,8 +107,11 @@ namespace ezAria2
 
         private void Test_Click(object sender, RoutedEventArgs e)
         {
-            TaskManager TaskManager = new TaskManager();
-            TaskManager.Show();
+            if(TasksInProgress.SelectedItem!=null)
+            {
+                TaskManager TaskManager = new TaskManager((TaskLite)TasksInProgress.SelectedItem);
+                TaskManager.Show();
+            }
         }
     }
 }

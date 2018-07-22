@@ -28,7 +28,7 @@ namespace ezAria2
         /// <summary>
         /// 一个Timer，每秒触发一次
         /// </summary>
-        public static DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        //public static DispatcherTimer dispatcherTimer = new DispatcherTimer();
         /// <summary>
         /// ezAria2 GUI的配置文件
         /// </summary>
@@ -38,6 +38,7 @@ namespace ezAria2
         {
             ProCtl.Dispose();
             Aria2Methords.ShutDown();
+            Line.Quit();
         }
 
         private static void Crash(object sender, DispatcherUnhandledExceptionEventArgs e)//程序崩溃事件
@@ -81,8 +82,8 @@ namespace ezAria2
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             Application.Current.Exit += new ExitEventHandler(Quit);
             Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(Crash);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            dispatcherTimer.Start();
+            //dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            //dispatcherTimer.Start();
         }
     }
 

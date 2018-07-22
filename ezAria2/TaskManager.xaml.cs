@@ -23,28 +23,38 @@ namespace ezAria2
     /// </summary>
     public partial class TaskManager : MetroWindow
     {
-        //private TaskInformation TaskInformation;
-        private Test TestObj = new Test();
-        public TaskManager()
+        /// <summary>
+        /// View Model
+        /// </summary>
+        private SpeedChart MainChart { get; set; }
+
+        private TaskInformation MainInformation { get; set; }
+
+        public TaskManager(TaskLite e)
         {
             InitializeComponent();
-            //TaskInformation = new TaskInformation("helloworld");
-            //DataContext = TaskInformation;
-            DataContext = TestObj;
+            MainChart = new SpeedChart();
+            Chart.DataContext = MainChart;
+            MainInformation = new TaskInformation(e);
+            Lists.DataContext = MainInformation;
+            StartSpeedUpdate();
         }
 
-        class Test
+        private async void SpeedUpdate()
         {
-            public SeriesCollection SpeedLine { get;set;}
-            public Test()
+            MainChart.Add(await MainInformation.GetSpeed());
+            System.Threading.Thread.Sleep(1000);
+        }
+
+        private async void StartSpeedUpdate()
+        {
+            await Task.Run(() =>
             {
-                SpeedLine = new SeriesCollection();
-                ChartValues<int> LineValues = new ChartValues<int> { 1, 2, 3, 4 };
-                SpeedLine.Add(new LineSeries
+                while (true)
                 {
-                    Values = LineValues
-                });
-            }
+                    SpeedUpdate();
+                }
+            });
         }
     }
 }

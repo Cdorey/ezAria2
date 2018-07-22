@@ -13,9 +13,22 @@
     <StackPanel Orientation="Horizontal">
         <Metro:MetroScrollViewer>
             <Border BorderBrush="#19000000" BorderThickness="0,0,1,0" Width="200">
-                <StackPanel x:Name="lists">
-                    <Metro:MetroExpander Header="基本信息" Hint="提示"  />
-                    <Metro:MetroExpander Header="URL" Hint="1 / 100" />
+                <StackPanel x:Name="Lists">
+                    <Metro:MetroExpander Header="基本信息" IsExpanded="True" Hint="{Binding FileName}">
+                        <StackPanel>
+                            <TextBlock Text="GID:"/>
+                            <TextBlock Text="{Binding Gid}"/>
+                            <TextBlock Text="当前状态:"/>
+                            <TextBlock Text="{Binding State}"/>
+                            <TextBlock Text="GID:"/>
+                            <TextBlock Text="{Binding Gid}"/>
+                            <TextBlock Text="GID:"/>
+                            <TextBlock Text="{Binding Gid}"/>
+                            <TextBlock Text="GID:"/>
+                            <TextBlock Text="{Binding Gid}"/>
+                        </StackPanel>
+                    </Metro:MetroExpander>
+                    <!--<Metro:MetroExpander Header="URL" Hint="1 / 100" />-->
                     <Metro:MetroExpander Header="连接(Peers)" IsExpanded="True" Hint="可以修改" HintBackground="#FFF15151">
                         <ListBox>
                         </ListBox>
@@ -32,6 +45,16 @@
                 </StackPanel>
             </Border>
         </Metro:MetroScrollViewer>
-        <Chart:CartesianChart x:Name="Chart" MinWidth="500" Margin="0,0,0,0" Series="{Binding SpeedLine}"/>
+        <Chart:CartesianChart x:Name="Chart" MinWidth="500" Margin="0,0,0,0" Series="{Binding Lines}" Width="590">
+            <Chart:CartesianChart.AxisX>
+                <Chart:Axis LabelFormatter="{Binding DateTimeFormatter}" 
+                          MaxValue="{Binding AxisMax}" 
+                          MinValue="{Binding AxisMin}">
+                </Chart:Axis>
+            </Chart:CartesianChart.AxisX>
+            <Chart:CartesianChart.AxisY>
+                <Chart:Axis LabelFormatter="{Binding YFormatter}" />
+            </Chart:CartesianChart.AxisY>
+        </Chart:CartesianChart>
     </StackPanel>
 </Metro:MetroWindow>

@@ -40,7 +40,7 @@ namespace ezAria2
             StartSpeedUpdate();
         }
 
-        private async void SpeedUpdate()
+        private async Task SpeedUpdate()
         {
             MainChart.Add(await MainInformation.GetSpeed());
             System.Threading.Thread.Sleep(1000);
@@ -48,11 +48,11 @@ namespace ezAria2
 
         private async void StartSpeedUpdate()
         {
-            await Task.Run(() =>
+            await Task.Run( async () =>
             {
                 while (true)
                 {
-                    SpeedUpdate();
+                    await SpeedUpdate();
                 }
             });
         }

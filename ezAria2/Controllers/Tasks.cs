@@ -1,21 +1,13 @@
-﻿using LiveCharts;
-using LiveCharts.Configurations;
-using LiveCharts.Wpf;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using WebSocketSharp;
 
 namespace ezAria2
 {
@@ -117,9 +109,9 @@ namespace ezAria2
         /// </summary>
         protected int OughtToRefresh = 0;
 
-        public delegate void TaskFinish(TaskLite e);
+        public delegate void NotifyStatusChanged(TaskLite Sender, string e);
 
-        public event TaskFinish TaskFinished;//当前任务的status变成completed时触发
+        public event NotifyStatusChanged OnStatusChanged;//当前任务的status变成completed时触发
 
         public string State { get; set; }//任务的状态
 
@@ -176,73 +168,79 @@ namespace ezAria2
         /// <param name="e"></param>
         protected virtual void InformationRefresh(JRCtler.JsonRpcRes e)
         {
-            //计算当前下载速度
-            double SpeedLong = e.Result.downloadSpeed;
-            if (SpeedLong / 1024 == 0)
-                Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
-            else if (SpeedLong / 1048576 == 0)
-                Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
-            else
-                Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
-            OnPropertyChanged("Speed");
-
-            //更新状态
-            string NewStatus = e.Result.status;
-            if (Status != NewStatus)
+            if (e.Result!=null)
             {
-                Status = NewStatus;
-                switch (Status)
+                //计算当前下载速度
+                double SpeedLong = e.Result.downloadSpeed;
+                if (SpeedLong / 1024 == 0)
+                    Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
+                else if (SpeedLong / 1048576 == 0)
+                    Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
+                else
+                    Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
+                OnPropertyChanged("Speed");
+
+                //更新状态
+                string NewStatus = e.Result.status;
+                if (Status != NewStatus)
                 {
-                    case "active":
-                        State = "none";
-                        break;
-                    case "waiting":
-                        State = "wait";
-                        OughtToRefresh = 5;
-                        break;
-                    case "paused":
-                        State = "error";
-                        OughtToRefresh = 5;
-                        break;
-                    case "error":
-                        State = "error";
-                        OughtToRefresh = 10;
-                        break;
-                    case "complete":
-                        State = "none";
-                        TaskFinished?.Invoke(this);
-                        OughtToRefresh = 10;
-                        break;
-                    case "removed":
-                        State = "error";
-                        OughtToRefresh = 10;
-                        break;
-                    default:
-                        State = "wait";
-                        OughtToRefresh = 5;
-                        break;
+                    Status = NewStatus;
+                    switch (Status)
+                    {
+                        case "active":
+                            State = "none";
+                            break;
+                        case "waiting":
+                            State = "wait";
+                            OughtToRefresh = 5;
+                            break;
+                        case "paused":
+                            State = "error";
+                            OughtToRefresh = 5;
+                            break;
+                        case "error":
+                            State = "error";
+                            OughtToRefresh = 10;
+                            break;
+                        case "complete":
+                            State = "none";
+                            OnStatusChanged?.Invoke(this, "complete");
+                            OughtToRefresh = 10;
+                            break;
+                        case "removed":
+                            State = "error";
+                            OnStatusChanged?.Invoke(this, "removed");
+                            OughtToRefresh = 10;
+                            break;
+                        default:
+                            State = "wait";
+                            OughtToRefresh = 5;
+                            break;
+                    }
+                    OnPropertyChanged("State");
                 }
-                OnPropertyChanged("State");
-            }
+                //更新进度
+                string CompletedNew = e.Result.completedLength;
+                Total = e.Result.totalLength;
+                if (CompletedNew != Completed)
+                {
+                    Completed = CompletedNew;
+                    OnPropertyChanged("Progress");
+                }
+                else if (CompletedNew == "0")
+                {
+                    State = "wait";
+                    OnPropertyChanged("State");
+                }
 
-            //更新进度
-            string CompletedNew = e.Result.completedLength;
-            Total = e.Result.totalLength;
-            if (CompletedNew != Completed)
-            {
-                Completed = CompletedNew;
-                OnPropertyChanged("Progress");
+                Gid = e.Result.gid;
+                if (FileName == null || FileNameSource != FileNameSources.Path)
+                    GetFileInfo();
             }
-            else if (CompletedNew == "0")
+            else
             {
-                State = "wait";
-                OnPropertyChanged("State");
+                OnStatusChanged?.Invoke(this, "null");
             }
-
-            Gid = e.Result.gid;
-            if (FileName == null || FileNameSource != FileNameSources.Path)
-                GetFileInfo();
-            e = null;
         }
 
         /// <summary>
@@ -332,10 +330,13 @@ namespace ezAria2
 
         private List<string> GidList = new List<string>();//该列表用于存储已经添加过的任务GID，避免重复添加
 
-        private void RemoveTask(TaskLite e)//当任务完成后移除并触发任务列表的TaskFinish事件
+        private void StatusChangedHandle(TaskLite Sender, string e)//当任务状态有变化时的处理程序
         {
-            FinishedTaskList.Enqueue(e);
-            TaskFinished(e);
+            FinishedTaskList.Enqueue(Sender);
+            if (e=="complete")
+            {
+                TaskFinished(Sender);
+            }
         }
 
         private void CheckRefreshResult(JRCtler.JsonRpcRes e)//检查Refresh方法中异步返回的结果
@@ -378,9 +379,9 @@ namespace ezAria2
         {
             for (int i = 0; i < Count; i++)
             {
-                this[i].TaskFinished += RemoveTask;
+                this[i].OnStatusChanged += StatusChangedHandle;
                 await this[i].RefreshAsync();
-                this[i].TaskFinished -= RemoveTask;
+                this[i].OnStatusChanged -= StatusChangedHandle;
             }
             while (FinishedTaskList.Count != 0)
             {
@@ -600,586 +601,4 @@ namespace ezAria2
         }
     }
 
-    //public class Commander : ICommand
-    //{
-    //    public event EventHandler CanExecuteChanged;
-
-    //    public bool CanExecute(object parameter)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public void Execute(object parameter)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
-    /// <summary>
-    /// JsonRpc控制器，基于WebSocket
-    /// </summary>
-    public class JRCtler
-    {
-        private class JsonRpcReq//一个请求消息对象
-        {
-            [JsonProperty(PropertyName = "jsonrpc")]
-            public string Version { get { return "2.0"; } }
-            [JsonProperty(PropertyName = "method")]
-            public string Method { get; set; }
-            [JsonProperty(PropertyName = "params")]
-            public ArrayList Params { get; set; }
-            [JsonProperty(PropertyName = "id")]
-            public int Id { get; set; }
-            public JsonRpcReq(string n, int i, ArrayList e)
-            {
-                Method = n;
-                Id = i;
-                Params = e;
-            }
-        }
-
-        public class JsonRpcRes//一个回复消息对象
-        {
-            [JsonProperty(PropertyName = "jsonrpc")]
-            public string Version { get; set; }
-            [JsonProperty(PropertyName = "method")]
-            public string Method { get; set; }
-            [JsonProperty(PropertyName = "result")]
-            public dynamic Result { get; set; }
-            [JsonProperty(PropertyName = "error")]
-            public ErrorInfo Error { get; set; }
-            [JsonProperty(PropertyName = "id")]
-            public int Id { get; set; }
-            public class ErrorInfo
-            {
-                [JsonProperty(PropertyName = "code")]
-                public string Code { get; set; }
-                [JsonProperty(PropertyName = "message")]
-                public string Message { get; set; }
-                [JsonProperty(PropertyName = "data")]
-                public string Data { get; set; }
-            }
-            public JsonRpcRes()
-            {
-                Id = -1;
-            }
-        }
-
-        //资源列表
-        private int Idlist = 1;//请求的ID序列号
-
-        private Dictionary<int, JsonRpcRes> RespondList = new Dictionary<int, JsonRpcRes>();//ID-JsonRpcRes字典
-
-        private WebSocket ws;//JsonRpc调用所使用的WebSocket链路
-
-        public Queue<JsonRpcRes> NoticeList = new Queue<JsonRpcRes>();//通知列表
-
-        //私有方法
-        private void Send(JsonRpcReq SendMessage)//发消息
-        {
-            ws.Send(JsonConvert.SerializeObject(SendMessage));
-        }
-
-        private void JsonRpcMessage(string Message)//收消息
-        {
-            JsonRpcRes NewMessage = JsonConvert.DeserializeObject<JsonRpcRes>(Message);
-            if (NewMessage.Id == -1)
-            {
-                NoticeList.Enqueue(NewMessage);
-            }
-            else
-            {
-                RespondList.Add(NewMessage.Id, NewMessage);
-            }
-            if (!File.Exists(@"log.txt"))
-            {
-                File.CreateText(@"log.txt").Close();
-            }
-            string Logs = File.ReadAllText(@"log.txt") + "Message:" + Message + Environment.NewLine;
-            File.WriteAllText(@"log.txt", Logs);
-        }
-
-        //公开方法
-        /// <summary>
-        /// 异步开始一个远程调用
-        /// </summary>
-        /// <param name="methord">方法</param>
-        /// <param name="Params">参数数组</param>
-        /// <returns></returns>
-        public async Task<JsonRpcRes> JsonRpcAsync(string methord, ArrayList Params)
-        {
-            JsonRpcReq NewTask = new JsonRpcReq(methord, Idlist++, Params);
-            Send(NewTask);//这一行应该调用控制器的方法执行NewTask请求
-            await Task.Run(() =>
-            {
-                while (!RespondList.ContainsKey(NewTask.Id))
-                {
-                    Thread.Sleep(500);
-                }
-            });
-            return RespondList[NewTask.Id];
-        }
-
-        /// <summary>
-        /// 同步开始一个远程调用
-        /// </summary>
-        /// <param name="methord">方法</param>
-        /// <param name="Params">参数数组</param>
-        /// <returns></returns>
-        public JsonRpcRes JsonRpc(string methord, ArrayList Params)
-        {
-            JsonRpcReq NewTask = new JsonRpcReq(methord, Idlist++, Params);
-            Send(NewTask);//这一行应该调用控制器的方法执行NewTask请求
-
-            while (!RespondList.ContainsKey(NewTask.Id))
-            {
-                Thread.Sleep(500);
-            }
-            var s = RespondList[NewTask.Id];
-            RespondList.Remove(NewTask.Id);
-            return s;
-        }
-
-        public void Quit()
-        {
-            ws.Close();
-        }
-
-        //构造函数
-        public JRCtler(string Uri)
-        {
-            ws = new WebSocket(Uri);
-            ws.Connect();
-            ws.OnOpen += (sender, e) =>
-            {
-
-            };
-            ws.OnMessage += (sender, e) =>
-            {
-                JsonRpcMessage(e.Data);
-            };
-        }
-
-    }
-
-    /// <summary>
-    /// 一个速度曲线图
-    /// </summary>
-    public class SpeedChart
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        /// <summary>
-        /// 一系列线的集合，绑定Chart的Series属性；
-        /// </summary>
-        public SeriesCollection Lines { get; set; }
-
-        public Axis DateTimeAxis { get; set; }
-
-        public Axis SpeedAxis { get; set; }
-
-        /// <summary>
-        /// SpeedLine上的点数据
-        /// </summary>
-        public class SpeedLinePoint
-        {
-            public long DateTime { get; set; }
-            public long Value { get; set; }
-        }
-
-        /// <summary>
-        /// SpeedLine的值
-        /// </summary>
-        public ChartValues<SpeedLinePoint> DownloadSpeedValues { get; set; }
-
-        /// <summary>
-        /// 速度曲线
-        /// </summary>
-        public LineSeries DownloadSpeedLine { get; set; }
-
-        /// <summary>
-        /// SpeedLine的值
-        /// </summary>
-        public ChartValues<SpeedLinePoint> UploadSpeedValues { get; set; }
-
-        /// <summary>
-        /// 速度曲线
-        /// </summary>
-        public LineSeries UploadSpeedLine { get; set; }
-
-        /// <summary>
-        /// X轴 时间
-        /// </summary>
-        public Func<double, string> DateTimeFormatter { get; set; }
-
-        private void NewFormatter()
-        {
-            DateTimeFormatter = value =>
-            {
-                return new DateTime((long)value).ToString("hh:mm:ss");
-            };
-            SpeedDataFormatter = value =>
-             {
-                 return value.ToString();
-             };
-        }
-
-        private long XAxisLength;//时间轴长度，默认60（秒）
-
-        /// <summary>
-        /// X轴最大值
-        /// </summary>
-        public long AxisMax
-        {
-            get { return _axisMax; }
-            set
-            {
-                _axisMax = value;
-                OnPropertyChanged("AxisMax");
-            }
-        }
-        private long _axisMax;
-
-        /// <summary>
-        /// X轴最小值
-        /// </summary>
-        public long AxisMin
-        {
-            get { return _axisMin; }
-            set
-            {
-                _axisMin = value;
-                OnPropertyChanged("AxisMin");
-            }
-        }
-        private long _axisMin;
-
-        /// <summary>
-        /// 创建时间轴
-        /// </summary>
-        /// <param name="now">以该时刻作为终点</param>
-        private void SetAxisLimits(DateTime now)
-        {
-            AxisMax = (now.Ticks + TimeSpan.FromSeconds(1).Ticks);
-            AxisMin = (now.Ticks - TimeSpan.FromSeconds(XAxisLength-1).Ticks);
-        }
-
-        /// <summary>
-        /// Y轴 速度
-        /// </summary>
-        public Func<long, string> SpeedDataFormatter { get; set; }
-
-        //public int AxisStep { get; set; }
-
-        //public int AxisUnit { get; set; }
-
-        /// <summary>
-        /// 增加一个点
-        /// </summary>
-        /// <param name="Speed">当前速度</param>
-        public void Add(long[] Speed)
-        {
-            var Now = DateTime.Now;
-            DownloadSpeedValues.Add(new SpeedLinePoint
-            {
-                DateTime = Now.Ticks,
-                Value = Speed[0]
-            });
-
-            UploadSpeedValues.Add(new SpeedLinePoint
-            {
-                DateTime = Now.Ticks,
-                Value = Speed[1]
-            });
-
-            SetAxisLimits(Now);
-
-            //超出点数后移除最初的
-            if (DownloadSpeedValues.Count > XAxisLength) DownloadSpeedValues.RemoveAt(0);
-            if (UploadSpeedValues.Count > XAxisLength) UploadSpeedValues.RemoveAt(0);
-        }
-
-        public SpeedChart()
-        {
-            //SpeedLinePoint a = new SpeedLinePoint
-            //{
-            //    DateTime = DateTime.Now,
-            //    Value = 0
-            //};
-            //SpeedLinePoint[] b = new SpeedLinePoint[50];
-            DownloadSpeedValues = new ChartValues<SpeedLinePoint>();
-            UploadSpeedValues = new ChartValues<SpeedLinePoint>();
-
-            NewFormatter();
-            var mapper = Mappers.Xy<SpeedLinePoint>()
-                .X(model => model.DateTime)   //use DateTime.Ticks as X
-                .Y(model => model.Value);           //use the value property as Y
-
-            //lets save the mapper globally.
-            Charting.For<SpeedLinePoint>(mapper);
-            XAxisLength = 60;
-            SetAxisLimits(DateTime.Now);
-            DownloadSpeedLine = new LineSeries
-            {
-                Values = DownloadSpeedValues
-            };
-            UploadSpeedLine = new LineSeries
-            {
-                Values = UploadSpeedValues
-            };
-            Lines = new SeriesCollection
-            {
-                DownloadSpeedLine,
-                //UploadSpeedLine
-            };
-
-        }
-    }
-
-
-    /// <summary>
-    /// Aria2 Rpc接口的方法库
-    /// </summary>
-    public static class Aria2Methords
-    {
-        private static string Base64Encode(string Path)
-        {
-            try
-            {
-                return Convert.ToBase64String(File.ReadAllBytes(Path));
-            }
-            catch (Exception)
-            {
-                throw new Exception();
-            }
-        }
-
-        /// <summary>
-        /// 新建一个任务
-        /// </summary>
-        /// <param name="Uri">下载链接的地址</param>
-        /// <returns></returns>
-        public static async Task<string> AddUri(string Uri)
-        {
-            string[] Uris = new string[] { Uri };
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Uris
-            };
-            string Gid = (await Stc.Line.JsonRpcAsync("aria2.addUri", Params)).Result;
-            return Gid;
-        }
-
-        /// <summary>
-        /// 新建一个任务，包含多个源
-        /// </summary>
-        /// <param name="Uris">这个包含多个下载链接的数组指向同一个文件</param>
-        /// <returns></returns>
-        public static async Task<string> AddUri(string[] Uris)
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Uris
-            };
-            string Gid = (await Stc.Line.JsonRpcAsync("aria2.addUri", Params)).Result;
-            return Gid;
-        }
-
-        /// <summary>
-        /// 添加种子
-        /// </summary>
-        /// <param name="Path">种子文件在计算机上的位置</param>
-        /// <returns></returns>
-        public static async Task<string> AddTorrent(string Path)
-        {
-            string TorrentBase64 = Base64Encode(Path);
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                TorrentBase64
-            };
-            string Gid = (await Stc.Line.JsonRpcAsync("aria2.addTorrent", Params)).Result;
-            return Gid;
-        }
-
-        /// <summary>
-        /// 添加MetaLink
-        /// </summary>
-        /// <param name="Path">MetaLink文件在计算机上的位置</param>
-        /// <returns></returns>
-        public static async Task<string> AddMetalink(string Path)
-        {
-            string MetalinkBase64 = Base64Encode(Path);
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                MetalinkBase64
-            };
-            string Gid = (await Stc.Line.JsonRpcAsync("aria2.addMetalink", Params)).Result;
-            return Gid;
-        }
-
-        public static async Task<string> Remove(string Gid)
-        {
-            string[] Gids = new string[] { Gid };
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Gids
-            };
-            string Result = (await Stc.Line.JsonRpcAsync("aria2.remove", Params)).Result;
-            return Result;
-        }
-
-        public static async Task<string> Pause(string Gid)
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Gid
-            };
-            string Result = (await Stc.Line.JsonRpcAsync("aria2.pause", Params)).Result;
-            return Result;
-        }
-
-        public static async Task PauseAll()
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-            };
-            string Result = (await Stc.Line.JsonRpcAsync("aria2.pauseAll", Params)).Result;
-        }
-
-        public static async Task<string> UpPause(string Gid)
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Gid
-            };
-            string Result = (await Stc.Line.JsonRpcAsync("aria2.unpause", Params)).Result;
-            return Result;
-        }
-
-        public static async Task UpPauseAll()
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-            };
-            string Result = (await Stc.Line.JsonRpcAsync("aria2.unpauseAll", Params)).Result;
-        }
-
-        public static async Task<JRCtler.JsonRpcRes> TellStatus(string Gid)
-        {
-            string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Gid,
-                Keys
-            };
-            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellStatus", Params);
-            return Result;
-        }
-
-        public static async Task<JRCtler.JsonRpcRes> TellStatus(string Gid, string[] Keys)
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Gid,
-                Keys
-            };
-            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellStatus", Params);
-            return Result;
-        }
-
-        public static async Task<JRCtler.JsonRpcRes> TellActive()
-        {
-            string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Keys
-            };
-            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellActive", Params);
-            return Result;
-        }
-
-        public static async Task<JRCtler.JsonRpcRes> TellWaiting()
-        {
-            string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                0,
-                50,
-                Keys
-            };
-            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellWaiting", Params);
-            return Result;
-        }
-
-        /// <summary>
-        /// 查询已停止的任务
-        /// </summary>
-        /// <returns>返回最近50个结果</returns>
-        public static async Task<JRCtler.JsonRpcRes> TellStopped()
-        {
-            string[] Keys = new string[] { "status", "totalLength", "completedLength", "downloadSpeed", "gid" };
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                0,
-                50,
-                Keys
-            };
-            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.tellStopped", Params);
-            return Result;
-        }
-
-        public static async Task<JRCtler.JsonRpcRes> GetFiles(string Gid)
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-                Gid
-            };
-            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.getFiles", Params);
-            return Result;
-        }
-
-        public static async Task<JRCtler.JsonRpcRes> GetGlobalStat()
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-            };
-            JRCtler.JsonRpcRes Result = await Stc.Line.JsonRpcAsync("aria2.getGlobalStat", Params);
-            return Result;
-
-        }
-
-        /// <summary>
-        /// 关闭Aria2C，调用Aria2自己的方法
-        /// </summary>
-        public static void ShutDown()
-        {
-            ArrayList Params = new ArrayList
-            {
-                "token:" + Stc.GloConf.Rpc_secret,
-            };
-            JRCtler.JsonRpcRes Result = Stc.Line.JsonRpc("aria2.shutdown", Params);
-        }
-
-    }
 }

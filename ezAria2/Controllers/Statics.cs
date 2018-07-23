@@ -38,7 +38,6 @@ namespace ezAria2
         {
             ProCtl.Dispose();
             Aria2Methords.ShutDown();
-            Line.Quit();
         }
 
         private static void Crash(object sender, DispatcherUnhandledExceptionEventArgs e)//程序崩溃事件

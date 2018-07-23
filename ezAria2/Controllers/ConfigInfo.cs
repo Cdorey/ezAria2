@@ -735,14 +735,13 @@ namespace ezAria2
         /// </summary>
         public List<FinishedTask> HistoryTaskList { get; private set; }
 
-        private static string HistoryTaskListChanging = "HistoryTaskListIsChanging";
-
         public void HistoryTaskListAdd(FinishedTask e)
         {
-            lock(HistoryTaskListChanging)
-            {
-                HistoryTaskList.Add(e);
-            }
+            //lock(HistoryTaskListChanging)
+            //{
+            //    HistoryTaskList.Add(e);
+            //}
+            HistoryTaskList.Add(e);
         }
 
         private string HistoryTaskListToJson()

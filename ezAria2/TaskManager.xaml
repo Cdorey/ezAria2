@@ -45,15 +45,15 @@
                 </StackPanel>
             </Border>
         </Metro:MetroScrollViewer>
-        <Chart:CartesianChart x:Name="Chart" MinWidth="500" Margin="0,0,0,0" Series="{Binding Lines}" Width="590">
+        <Chart:CartesianChart x:Name="Chart" MinWidth="500" Margin="0,0,0,0" Series="{Binding Lines, Mode=OneWay}" Width="590">
             <Chart:CartesianChart.AxisX>
-                <Chart:Axis LabelFormatter="{Binding DateTimeFormatter}" 
-                          MaxValue="{Binding AxisMax}" 
-                          MinValue="{Binding AxisMin}">
+                <Chart:Axis LabelFormatter="{Binding DateTimeFormatter, Mode=OneWay}" 
+                          MaxValue="{Binding AxisMax, Mode=OneWay}" 
+                          MinValue="{Binding AxisMin, Mode=OneWay}">
                 </Chart:Axis>
             </Chart:CartesianChart.AxisX>
             <Chart:CartesianChart.AxisY>
-                <Chart:Axis LabelFormatter="{Binding YFormatter}" />
+                <Chart:Axis LabelFormatter="{Binding SpeedDataFormatter, Mode=OneWay}" />
             </Chart:CartesianChart.AxisY>
         </Chart:CartesianChart>
     </StackPanel>

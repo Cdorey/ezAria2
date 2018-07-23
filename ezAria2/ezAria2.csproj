@@ -113,7 +113,9 @@
     <Compile Include="AddTask.xaml.cs">
       <DependentUpon>AddTask.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\Charts.cs" />
     <Compile Include="Controllers\ConfigInfo.cs" />
+    <Compile Include="Controllers\Methods.cs" />
     <Compile Include="Controllers\Statics.cs" />
     <Compile Include="Controllers\Tasks.cs" />
     <Compile Include="Controllers\ProgressController.cs" />

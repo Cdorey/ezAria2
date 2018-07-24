@@ -77,14 +77,6 @@ namespace ezAria2
             Task.Show();
         }
 
-        private void ForDeveloper_ButtonClick(object sender, EventArgs e)
-        {
-        }
-
-        private void MetroWindow_Activated(object sender, EventArgs e)
-        {
-        }
-
         private void MetroBorder_MouseLeftButtonUp_StateChange(object sender, RoutedEventArgs e)
         {
             if(TasksInProgress.SelectedItem!=null)

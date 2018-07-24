@@ -173,10 +173,14 @@ namespace ezAria2
             SetAxisLimits(DateTime.Now);
             DownloadSpeedLine = new LineSeries
             {
+                Name = "DownloadSpeedLine",
+                Title = "下载速度",
                 Values = DownloadSpeedValues
             };
             UploadSpeedLine = new LineSeries
             {
+                Name = "UploadSpeedLine",
+                Title = "上传速度",
                 Values = UploadSpeedValues
             };
             Lines = new SeriesCollection

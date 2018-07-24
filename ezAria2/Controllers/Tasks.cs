@@ -57,7 +57,7 @@ namespace ezAria2
         /// <summary>
         /// 尝试获取当前任务的文件名
         /// </summary>
-        protected async void GetFileInfo()
+        protected virtual async void GetFileInfo()
         {
             JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
             if (x.Result.Count == 1)
@@ -145,7 +145,11 @@ namespace ezAria2
         {
             get
             {
-                if (long.Parse(Total) == 0)
+                if (Total==null)
+                {
+                    return 0;
+                }
+                else if(long.Parse(Total) == 0)
                 {
                     return 0;
                 }
@@ -219,6 +223,7 @@ namespace ezAria2
                     }
                     OnPropertyChanged("State");
                 }
+
                 //更新进度
                 string CompletedNew = e.Result.completedLength;
                 Total = e.Result.totalLength;
@@ -260,9 +265,16 @@ namespace ezAria2
             }
         }
 
-        private async void Refresh()
+        protected virtual async void Refresh()
         {
-            await RefreshAsync();
+            await Task.Run(async () =>
+            {
+                while(true)
+                {
+                    await RefreshAsync();
+                    System.Threading.Thread.Sleep(1000);
+                }
+            });
         }
 
         /// <summary>
@@ -413,7 +425,73 @@ namespace ezAria2
     {
         protected override void InformationRefresh(JRCtler.JsonRpcRes e)
         {
-            base.InformationRefresh(e);
+            if (e.Result != null)
+            {
+                //计算当前下载速度
+                double SpeedLong = e.Result.downloadSpeed;
+                if (SpeedLong / 1024 == 0)
+                    Speed = Math.Round(SpeedLong, 2).ToString() + "B/S";
+                else if (SpeedLong / 1048576 == 0)
+                    Speed = Math.Round((SpeedLong / 1024), 2).ToString() + "KB/S";
+                else
+                    Speed = Math.Round((SpeedLong / 1048578), 2).ToString() + "MB/S";
+                OnPropertyChanged("Speed");
+
+                //更新状态
+                string NewStatus = e.Result.status;
+                if (Status != NewStatus)
+                {
+                    Status = NewStatus;
+                    switch (Status)
+                    {
+                        case "active":
+                            State = "正在下载";
+                            break;
+                        case "waiting":
+                            State = "等待下载";
+                            OughtToRefresh = 5;
+                            break;
+                        case "paused":
+                            State = "任务暂停";
+                            OughtToRefresh = 5;
+                            break;
+                        case "error":
+                            State = "下载错误";
+                            OughtToRefresh = 10;
+                            break;
+                        case "complete":
+                            State = "下载完成";
+                            OughtToRefresh = 10;
+                            break;
+                        case "removed":
+                            State = "已经删除";
+                            OughtToRefresh = 10;
+                            break;
+                        default:
+                            State = "状态未知";
+                            OughtToRefresh = 5;
+                            break;
+                    }
+                    OnPropertyChanged("State");
+                }
+                //更新进度
+                string CompletedNew = e.Result.completedLength;
+                Total = e.Result.totalLength;
+                if (CompletedNew != Completed)
+                {
+                    Completed = CompletedNew;
+                    OnPropertyChanged("Progress");
+                }
+                else if (CompletedNew == "0")
+                {
+                    State = "等待下载";
+                    OnPropertyChanged("State");
+                }
+
+                Gid = e.Result.gid;
+                if (FileName == null || FileNameSource != FileNameSources.Path)
+                    GetFileInfo();
+            }
         }
 
         public override async Task RefreshAsync()
@@ -422,9 +500,66 @@ namespace ezAria2
             InformationRefresh(e);
         }
 
-        public string[] FilesList { get; set; }
+        protected override async void Refresh()
+        {
+            await RefreshAsync();
+        }
 
-        public string[] Peers { get; set; }
+        public ObservableCollection<string> FilesList { get; set; }
+
+        public string FileCount
+        {
+            get
+            {
+                return FilesList.Count.ToString()+"个文件";
+            }
+        }
+
+        public ObservableCollection<string> Peers { get; set; }
+
+        public string EstimatedRemainingTime
+        {
+            get
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// 尝试获取当前任务的文件名
+        /// </summary>
+        protected override async void GetFileInfo()
+        {
+            JRCtler.JsonRpcRes x = await Aria2Methords.GetFiles(Gid);
+            if (x.Result.Count != 0)
+            {
+                string filepath = x.Result[0].path;
+                if (filepath != null)
+                {
+                    foreach (dynamic a in x.Result)
+                    {
+                        string path = a.path;
+                        string s = path.Substring(path.LastIndexOf(@"/") + 1);
+                        FilesList.Add(s);
+                        OnPropertyChanged("FileCount");
+                    }
+                }
+                else
+                {
+                    string uri = x.Result[0].uris[0].uri;
+                    FileName = uri.Substring(uri.LastIndexOf(@"/") + 1);
+                    FileNameSource = FileNameSources.Uri;
+                }
+            }
+            else
+            {
+                string FirstFilePath = x.Result[0].path;
+                int count = x.Result.Count;
+                FileName = FirstFilePath.Substring(FirstFilePath.LastIndexOf(@"/") + 1) + "等，共计" + count.ToString() + "个文件";
+            }
+            OnPropertyChanged("FileName");
+            OnPropertyChanged("FilesList");
+        }
 
         /// <summary>
         /// 获取速度信息
@@ -447,12 +582,18 @@ namespace ezAria2
         public TaskInformation(TaskLite e)
         {
             Gid = e.Gid;
+            Refresh();
+            FilesList = new ObservableCollection<string>();
+            Peers = new ObservableCollection<string>();
         }
 
-        public TaskInformation(string e)
-        {
-            Gid = e;
-        }
+        //public TaskInformation(string e)
+        //{
+        //    Gid = e;
+        //    Refresh();
+        //    FilesList = new ObservableCollection<string>();
+        //    Peers = new ObservableCollection<string>();
+        //}
     }
 
     public class FinishedTask : Aria2cTask//已完成任务
@@ -483,7 +624,6 @@ namespace ezAria2
 
         public string Path { get; set; }//文件路径
 
-        private string filesize;
         public string FileSize //文件尺寸
         {
             get
@@ -511,6 +651,7 @@ namespace ezAria2
                 }
             }
         }
+        private string filesize;
     }
 
     public sealed class HistoryList : ObservableCollection<FinishedTask>//历史任务列表

@@ -38,6 +38,8 @@ namespace ezAria2
             MainInformation = new TaskInformation(e);
             Lists.DataContext = MainInformation;
             StartSpeedUpdate();
+            FilesListBox.ItemsSource = MainInformation.FilesList;
+            PeersListBox.ItemsSource = MainInformation.Peers;
         }
 
         private async Task SpeedUpdate()

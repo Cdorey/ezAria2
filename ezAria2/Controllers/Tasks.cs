@@ -79,7 +79,7 @@ namespace ezAria2
             {
                 string path = x.Result[0].path;
                 int count = x.Result.Count;
-                FileName = path.Substring(path.IndexOf(@"/") + 1, path.LastIndexOf(@"/")) + "，共计" + count.ToString() + "个文件";
+                FileName = path.Substring(path.LastIndexOf(@"/") + 1) + "等，共计" + count.ToString() + "个文件";
             }
             OnPropertyChanged("FileName");
         }

@@ -67,9 +67,6 @@
   <PropertyGroup />
   <PropertyGroup />
   <ItemGroup>
-    <Reference Include="DMSkin.WPF, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DMSkin.WPF.2.5.0.1\lib\net40\DMSkin.WPF.dll</HintPath>
-    </Reference>
     <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
       <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
     </Reference>
@@ -249,6 +246,10 @@
     <ProjectReference Include="..\toolkit\Arthas\Arthas.csproj">
       <Project>{f5dbbc65-f7d3-4a0d-8a9f-3dafd3deb7ed}</Project>
       <Name>Arthas</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\toolkit\FlyingAria2c\FlyingAria2c.csproj">
+      <Project>{25677591-187d-4d06-9712-d8dbe4a6c450}</Project>
+      <Name>FlyingAria2c</Name>
     </ProjectReference>
     <ProjectReference Include="..\toolkit\websocket-sharp\websocket-sharp.csproj">
       <Project>{b357bac7-529e-4d81-a0d2-71041b19c8de}</Project>

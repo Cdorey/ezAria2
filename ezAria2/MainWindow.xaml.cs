@@ -10,10 +10,6 @@ namespace ezAria2
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        private bool TaskDataChanging = false;
-
-        private bool HistoryDataChanging = false;
-
         private DispatcherTimer dispatcherTimer = new DispatcherTimer();
 
         /// <summary>
